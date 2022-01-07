@@ -19,11 +19,11 @@ public class TwitterBolt extends BaseRichBolt {
     public void execute(Tuple input) {
         String text = input.getString(0);
         System.out.println("BOLTO " + text);
-        collector.emit(new Values(text));
+        collector.emit("stream", new Values(text));
     }
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields("line"));
+        declarer.declareStream("stream", new Fields("tweety"));
     }
 }

@@ -3,12 +3,15 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.apache.storm.utils.Utils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -20,24 +23,22 @@ public class TwitterStream {
     private static final String bearer = "AAAAAAAAAAAAAAAAAAAAAKe6XgEAAAAA4Ona%2B%2Bk8WJj0tzDV6JCc88BCahU%3Dsj83cSTF70p2XvIG4WVhTPNHhyliL3X0UeIyUOJwdG2LGUswuP";
 
     private static void connectStream() {
-        HttpClient client = HttpClients.custom().setDefaultRequestConfig(RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).build()).build();
+        CloseableHttpClient client = HttpClients.custom().setDefaultRequestConfig(RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).build()).build();
         try {
-            URIBuilder uriBuilder = new URIBuilder("https://api.twitter.com/2/tweets/search/stream/rules");
+            URIBuilder uriBuilder = new URIBuilder("https://api.twitter.com/2/tweets/search/stream");
             HttpGet httpGet = new HttpGet(uriBuilder.build());
             httpGet.setHeader("Authorization", String.format("Bearer %s", bearer));
 
-            HttpResponse response = client.execute(httpGet);
+            CloseableHttpResponse response = client.execute(httpGet);
             HttpEntity entity = response.getEntity();
 
             if(entity != null) {
                 BufferedReader reader = new BufferedReader(new InputStreamReader((entity.getContent())));
                 String line = reader.readLine();
-                while (line != null) {
-                    System.out.println("tweet"+line);
-                    line = reader.readLine();
-                }
+                System.out.println(line);
             }
-
+            response.close();
+            client.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -165,15 +166,12 @@ public class TwitterStream {
 
 
     public static void main(String[] args) {
-        if (null != bearer) {
-            Map<String, String> rules = new HashMap<>();
-            rules.put("cats has:images", "cat images");
-            rules.put("dogs has:images", "dog images");
-            //setupRules(rules);
-            //connectStream();
-            //deleteRules(getRules());
-        } else {
-            System.out.println("There was a problem getting your bearer token. Please make sure you set the BEARER_TOKEN environment variable");
+        Map<String, String> rules1 = new HashMap<>();
+        rules1.put("context:123.1220701888179359745", "covid");
+        setupRules(rules1);
+        while (true) {
+            connectStream();
+            Utils.sleep(10);
         }
 //        //  value    id
 //        Map<String, String> r = new HashMap<>();

@@ -33,13 +33,18 @@ public class TwitterSpout extends BaseRichSpout {
         this.contex = context;
         HttpClient client = HttpClients.custom().setDefaultRequestConfig(RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).build()).build();
         try {
-            uriBuilder = new URIBuilder("https://api.twitter.com/2/tweets/search/recent?query=covid");
+            //uriBuilder = new URIBuilder("https://api.twitter.com/2/tweets/search/recent?query=covid");
+            uriBuilder = new URIBuilder("https://api.twitter.com/2/tweets/search/stream?tweet.fields=created_at,entities");
             HttpGet httpGet = new HttpGet(uriBuilder.build());
             httpGet.setHeader("Authorization", String.format("Bearer %s", bearer));
             // httpGet.setHeader("Content-Type","Text"); // SERVE ?
 
             // MANCA DOVE SALVIAMO -> Map<asd, ASD>
             // MANCA LA CLASSE WRAPPER DELLE API
+
+            Map<String, String> rules1 = new HashMap<>();
+            rules1.put("music", "music");
+            TwitterStream.setupRules(rules1);
 
             HttpResponse response = client.execute(httpGet);
             HttpEntity entity = response.getEntity();

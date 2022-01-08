@@ -25,7 +25,7 @@ public class TwitterSpout extends BaseRichSpout {
     private BufferedReader reader;
     private TopologyContext contex;
     private URIBuilder uriBuilder;
-    private static String bearer = "AAAAAAAAAAAAAAAAAAAAAKe6XgEAAAAA4Ona%2B%2Bk8WJj0tzDV6JCc88BCahU%3Dsj83cSTF70p2XvIG4WVhTPNHhyliL3X0UeIyUOJwdG2LGUswuP";
+    private static String bearer = System.getenv("BEARER_TOKEN");
 
     @Override
     public void open(Map conf, TopologyContext context, SpoutOutputCollector collector) {
@@ -33,17 +33,12 @@ public class TwitterSpout extends BaseRichSpout {
         this.contex = context;
         HttpClient client = HttpClients.custom().setDefaultRequestConfig(RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).build()).build();
         try {
-            //uriBuilder = new URIBuilder("https://api.twitter.com/2/tweets/search/recent?query=covid");
-            uriBuilder = new URIBuilder("https://api.twitter.com/2/tweets/search/stream?tweet.fields=created_at,entities");
+            uriBuilder = new URIBuilder("https://api.twitter.com/2/tweets/search/stream");
             HttpGet httpGet = new HttpGet(uriBuilder.build());
             httpGet.setHeader("Authorization", String.format("Bearer %s", bearer));
-            // httpGet.setHeader("Content-Type","Text"); // SERVE ?
-
-            // MANCA DOVE SALVIAMO -> Map<asd, ASD>
-            // MANCA LA CLASSE WRAPPER DELLE API
 
             Map<String, String> rules1 = new HashMap<>();
-            rules1.put("music", "music");
+            rules1.put("context:123.1220701888179359745", "covid");
             TwitterStream.setupRules(rules1);
 
             HttpResponse response = client.execute(httpGet);
@@ -60,12 +55,13 @@ public class TwitterSpout extends BaseRichSpout {
         try {
             String line = reader.readLine();
 
-            if(line == null) {
-                this.spoutOutputCollector.emit("stream", new Values(new String("CIAO LINEA NULL")));
-            }
-            else {
+            if(line != null && i < 10) {
                 this.spoutOutputCollector.emit("stream", new Values(line));
                 i++;
+            }
+            else {
+                System.exit(0);
+                //this.spoutOutputCollector.emit("stream", new Values(new String("CIAO LINEA NULL")));
             }
         } catch(Exception e){
             e.printStackTrace();

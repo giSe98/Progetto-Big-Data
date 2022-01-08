@@ -20,7 +20,7 @@ import java.io.InputStreamReader;
 import java.util.*;
 
 public class TwitterStream {
-    private static final String bearer = "AAAAAAAAAAAAAAAAAAAAAKe6XgEAAAAA4Ona%2B%2Bk8WJj0tzDV6JCc88BCahU%3Dsj83cSTF70p2XvIG4WVhTPNHhyliL3X0UeIyUOJwdG2LGUswuP";
+    private static final String bearer = System.getenv("BEARER_TOKEN");
 
     private static void connectStream() {
         CloseableHttpClient client = HttpClients.custom().setDefaultRequestConfig(RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).build()).build();

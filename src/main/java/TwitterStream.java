@@ -166,29 +166,38 @@ public class TwitterStream {
 
 
     public static void main(String[] args) {
-        Map<String, String> rules1 = new HashMap<>();
-        rules1.put("context:123.1220701888179359745", "covid");
-        setupRules(rules1);
-        while (true) {
-            connectStream();
-            Utils.sleep(10);
-        }
-//        //  value    id
+//        Map<String, String> rules1 = new HashMap<>();
+//        rules1.put("context:123.1220701888179359745", "covid");
+//        setupRules(rules1);
+//        while (true) {
+//            connectStream();
+//            Utils.sleep(10);
+//        }
+        //  value    id
 //        Map<String, String> r = new HashMap<>();
 //        r.put("context:123.1220701888179359745 lang:en -is:retweet", "covid");
 
 
-//        HttpClient client = HttpClients.custom().setDefaultRequestConfig(RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).build()).build();
-//        try {
-//            URIBuilder uriBuilder = new URIBuilder("https://api.twitter.com/2/tweets/search/recent?query=covid");
-//            HttpGet httpGet = new HttpGet(uriBuilder.build());
-//            httpGet.setHeader("Authorization", String.format("Bearer %s", bearer));
-//            HttpResponse response = client.execute(httpGet);
-//            HttpEntity entity = response.getEntity();
+        HttpClient client = HttpClients.custom().setDefaultRequestConfig(RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).build()).build();
+        try {
+            URIBuilder uriBuilder = new URIBuilder("https://api.twitter.com/2/tweets/1479880081787006981");
+            HttpGet httpGet = new HttpGet(uriBuilder.build());
+            httpGet.setHeader("Authorization", String.format("Bearer %s", bearer));
+            httpGet.setHeader("content-type", "application/json");
+            HttpResponse response = client.execute(httpGet);
+            HttpEntity entity = response.getEntity();
 //            BufferedReader reader = new BufferedReader(new InputStreamReader(entity.getContent()));
 //            System.out.println(reader.readLine());
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+            if(entity != null) {
+                JSONObject jsonObject = new JSONObject(EntityUtils.toString(entity, "UTF-8"));
+                System.out.println(jsonObject);
+
+                String object = jsonObject.getJSONObject("data").getString("text");
+                System.out.println(object.contains("novax"));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

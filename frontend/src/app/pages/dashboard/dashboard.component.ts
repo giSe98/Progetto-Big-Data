@@ -1,6 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import Chart from 'chart.js';
 
+
 @Component({
   selector: "app-dashboard",
   templateUrl: "dashboard.component.html"
@@ -15,6 +16,10 @@ export class DashboardComponent implements OnInit {
   public clicked: boolean = true;
   public clicked1: boolean = false;
   public clicked2: boolean = false;
+  
+  selectedYear: string;
+  anni = ["2020", "2021", "2022"];
+
 
   constructor() {}
 

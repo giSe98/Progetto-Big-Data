@@ -5,6 +5,7 @@ import { HttpClientModule } from "@angular/common/http";
 import { RouterModule } from "@angular/router";
 import { ToastrModule } from 'ngx-toastr';
 
+
 import { AppComponent } from "./app.component";
 import { AdminLayoutComponent } from "./layouts/admin-layout/admin-layout.component";
 //import { AuthLayoutComponent } from './layouts/auth-layout/auth-layout.component';
@@ -25,7 +26,7 @@ import { ComponentsModule } from "./components/components.module";
     AppRoutingModule,
     ToastrModule.forRoot()
   ],
-  declarations: [AppComponent, AdminLayoutComponent/*, AuthLayoutComponent*/],
+  declarations: [AppComponent, AdminLayoutComponent/*, AuthLayoutComponent*/, ],
   providers: [],
   bootstrap: [AppComponent]
 })

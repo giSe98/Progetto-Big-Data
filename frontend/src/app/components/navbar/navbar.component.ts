@@ -172,7 +172,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
     }
     return "Dashboard";
   }*/
-
+  
   open(content) {
     this.modalService.open(content, {windowClass: 'modal-search'}).result.then((result) => {
       this.closeResult = `Closed with: ${result}`;

@@ -3,6 +3,8 @@ import { HttpClientModule } from "@angular/common/http";
 import { RouterModule } from "@angular/router";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
+import {MatSelectModule} from '@angular/material/select';
+import {MatFormFieldModule} from '@angular/material/form-field';
 
 import { AdminLayoutRoutes } from "./admin-layout.routing";
 import { DashboardComponent } from "../../pages/dashboard/dashboard.component";
@@ -23,6 +25,8 @@ import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
     FormsModule,
     HttpClientModule,
     NgbModule,
+    MatSelectModule,
+    MatFormFieldModule
   ],
   declarations: [
     DashboardComponent/*,

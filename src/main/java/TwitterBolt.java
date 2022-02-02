@@ -18,7 +18,7 @@ public class TwitterBolt extends BaseRichBolt {
     @Override
     public void execute(Tuple input) {
         String text = input.getString(0);
-        System.out.println("BOLTO " + text);
+        //System.out.println("BOLTO " + text);
         collector.emit("stream", new Values(text));
     }
 

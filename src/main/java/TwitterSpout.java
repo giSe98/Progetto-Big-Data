@@ -26,6 +26,7 @@ public class TwitterSpout extends BaseRichSpout {
     private TopologyContext contex;
     private URIBuilder uriBuilder;
     private static String bearer = System.getenv("BEARER_TOKEN");
+    String URL = "tweet.fields=attachments,author_id,context_annotations,conversation_id,created_at,entities,geo,id,in_reply_to_user_id,lang,possibly_sensitive,public_metrics,referenced_tweets,reply_settings,source,text,withheld&expansions=attachments.poll_ids,attachments.media_keys,author_id,geo.place_id,in_reply_to_user_id,referenced_tweets.id,entities.mentions.username,referenced_tweets.id.author_id&place.fields=contained_within,country,country_code,full_name,geo,id,name,place_type&poll.fields=duration_minutes,end_datetime,id,options,voting_status&user.fields=created_at,description,entities,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld";
 
     @Override
     public void open(Map conf, TopologyContext context, SpoutOutputCollector collector) {
@@ -33,7 +34,7 @@ public class TwitterSpout extends BaseRichSpout {
         this.contex = context;
         HttpClient client = HttpClients.custom().setDefaultRequestConfig(RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).build()).build();
         try {
-            uriBuilder = new URIBuilder("https://api.twitter.com/2/tweets/search/stream");
+            uriBuilder = new URIBuilder("https://api.twitter.com/2/tweets/search/stream?" + URL);
             HttpGet httpGet = new HttpGet(uriBuilder.build());
             httpGet.setHeader("Authorization", String.format("Bearer %s", bearer));
 
@@ -55,7 +56,7 @@ public class TwitterSpout extends BaseRichSpout {
         try {
             String line = reader.readLine();
 
-            if(line != null && i < 10) {
+            if(line != null && i < 20) {
                 this.spoutOutputCollector.emit("stream", new Values(line));
                 i++;
             }

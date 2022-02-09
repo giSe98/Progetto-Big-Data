@@ -3,6 +3,9 @@ import edu.stanford.nlp.pipeline.CoreSentence;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +33,7 @@ import java.util.List;
             return sentiment;
         }
 
-        public static void main(String[] args) {
+        public static void main(String[] args) throws IOException, InterruptedException {
 //            String sentiment="";
 //            StanfordCoreNLP stanfordCoreNLP = Pipeline.getPipeline();
 //            //String text = "Oh dear So #novax is now under investigation by his own country *and* Spain, and Canada, the US and others have taken note of the Australian brouhaha... I suspect his 'oh, I'm unvaxxed but I'm safe' shpiel is going to become a *lot* harder in the future.";
@@ -274,6 +277,4 @@ import java.util.List;
 //            System.out.println(c);
             System.out.println(jj.getJSONObject("data").has("referenced_tweets"));
         }
-
-
     }

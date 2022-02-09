@@ -82,7 +82,7 @@ public class TwitterBolt extends BaseRichBolt {
         update(device, source);
 
         //query su location dell'utente
-        //getCountry(o);
+        getCountry(o);
 
         i++;
         collector.emit("stream", new Values(input.getString(0)));

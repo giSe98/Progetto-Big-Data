@@ -10,7 +10,7 @@ public class TwitterMainTopology {
         builder.setBolt("TwitterBolt", new TwitterBolt()).shuffleGrouping("TwitterSpout", "stream");
 
         Config config = new Config();
-        config.put(Config.TOPOLOGY_BOLTS_WINDOW_LENGTH_DURATION_MS,6000);   //lunghezza della topologia
+        config.put(Config.TOPOLOGY_BOLTS_WINDOW_LENGTH_DURATION_MS,10000);   //lunghezza della topologia
         //config.setDebug(false);
 
         try (LocalCluster cluster = new LocalCluster()) {

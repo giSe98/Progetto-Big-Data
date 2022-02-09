@@ -13,14 +13,14 @@ import java.util.List;
             this.tweets=tweets;
         }
 
-        public SentimentAnalysis(String tweet){
-            this.tweet=tweet;
+        public SentimentAnalysis(){
+
         }
 
-        public String analysis(){
+        public String analysis(String text){
             String sentiment="";
             StanfordCoreNLP stanfordCoreNLP = Pipeline.getPipeline();
-            CoreDocument coreDocument = new CoreDocument(tweet);
+            CoreDocument coreDocument = new CoreDocument(text);
             stanfordCoreNLP.annotate(coreDocument);
             List<CoreSentence> sentences = coreDocument.sentences();
             for(CoreSentence sentence : sentences) {

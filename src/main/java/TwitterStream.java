@@ -178,8 +178,8 @@ public class TwitterStream {
         }
         */
         //  value    id
-        Map<String, String> r = new HashMap<>();
-        r.put("context:123.1220701888179359745 lang:en -is:retweet", "covid");
+//        Map<String, String> r = new HashMap<>();
+//        r.put("context:123.1220701888179359745 lang:en -is:retweet", "covid");
 
 
         HttpClient client = HttpClients.custom().setDefaultRequestConfig(RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).build()).build();

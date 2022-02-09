@@ -80,6 +80,29 @@ public class TwitterBolt extends BaseRichBolt {
         collector.emit("stream", new Values(input.getString(0)));
     }
 
+    private void checkRetweet(JSONObject o) {
+        if (o.getJSONObject("data").has("referenced_tweets")) {
+            //retweet con più like
+            bestRetweet(o);
+            retweet++;
+        }
+    }
+
+    private void bestRetweet(JSONObject o) {
+        int c = Integer.parseInt(o.getJSONObject("data").getJSONObject("public_metrics").getString("retweet_count"));
+        if (c > bestR) {
+            bestR = c;
+            retweetObj = o;
+        }
+    }
+
+    private void updateSource(String source) {
+        if (device.containsKey(source))
+            device.put(source, device.get(source) + 1);
+        else
+            device.put(source, 1);
+    }
+
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
         declarer.declareStream("stream", new Fields("tweety"));

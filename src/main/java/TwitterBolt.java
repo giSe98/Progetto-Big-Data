@@ -10,6 +10,9 @@ import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,8 +25,10 @@ public class TwitterBolt extends BaseRichBolt {
     private int i=0; //indice tweet
 
     private StanfordCoreNLP stanfordCoreNLP = null;
+
     private Map<String,Integer> valoriAnalisi= new HashMap<>();
     private Map<String, Integer> device = new HashMap<>();
+    private Map<String, Integer> countries = new HashMap<>();
 
     private int bestR = Integer.MIN_VALUE; // indice retweet
     private JSONObject retweetObj; // object
@@ -64,7 +69,7 @@ public class TwitterBolt extends BaseRichBolt {
         JSONObject o = new JSONObject(line);
         if(o.getJSONObject("data").getString("lang").equals("en")) {
             String dato = o.getJSONObject("data").getString("text");
-            dato = clean(dato);
+            dato = clear(dato);
             String sentiment = analysis(dato);
             valoriAnalisi.put(sentiment,valoriAnalisi.get(sentiment)+1);
         }
@@ -74,7 +79,10 @@ public class TwitterBolt extends BaseRichBolt {
 
         //query sul tipo di device
         String source = o.getJSONObject("data").getString("source");
-        updateSource(source);
+        update(device, source);
+
+        //query su location dell'utente
+        //getCountry(o);
 
         i++;
         collector.emit("stream", new Values(input.getString(0)));
@@ -96,11 +104,30 @@ public class TwitterBolt extends BaseRichBolt {
         }
     }
 
-    private void updateSource(String source) {
-        if (device.containsKey(source))
-            device.put(source, device.get(source) + 1);
+    private void update(Map<String, Integer> map, String source) {
+        if (map.containsKey(source))
+            map.put(source, map.get(source) + 1);
         else
-            device.put(source, 1);
+            map.put(source, 1);
+    }
+
+    private void getCountry(JSONObject o) {
+        String country = "";
+        String city = o.getJSONArray("users").getJSONObject(0).getString("location").split(",\\s\\w+")[0];
+        String cmd = String.format("geocode '%s' --provider arcgis", city);
+        Runtime run = Runtime.getRuntime();
+        Process pr = null;
+
+        try {
+            pr = run.exec(cmd);
+            pr.waitFor();
+            BufferedReader buf = new BufferedReader(new InputStreamReader(pr.getInputStream()));
+            country = new JSONObject(buf.readLine()).getString("address").split(", ")[1];
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        update(countries, country);
     }
 
     @Override
@@ -108,7 +135,7 @@ public class TwitterBolt extends BaseRichBolt {
         declarer.declareStream("stream", new Fields("tweety"));
     }
 
-    private static String clean(String object) {
+    private static String clear(String object) {
         object=object.toLowerCase();
         //remove urls
         object=object.replaceAll("((www\\.[^\\s]+)|(https?://[^\\s]+))", "");

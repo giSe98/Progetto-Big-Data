@@ -61,6 +61,11 @@ public class TwitterBolt extends BaseRichBolt {
             System.out.println("--------------------------------------------------------------------------------");
             //stampa se sono retweet
             System.out.println("sono retweet= "+retweet+" non lo sono= "+(numTweet-retweet));
+            System.out.println("--------------------------------------------------------------------------------");
+            //stampa device
+            countries.entrySet().forEach(entry->{
+                System.out.println(entry.getKey()+" "+entry.getValue());
+            });
             System.exit(0);
         }
 
@@ -112,22 +117,30 @@ public class TwitterBolt extends BaseRichBolt {
     }
 
     private void getCountry(JSONObject o) {
+        //TODO se è Giapponese/Cinese/linguaggi con simboli si deve tradurre in inglese -> https://stackoverflow.com/questions/8147284/how-to-use-google-translate-api-in-my-java-application
         String country = "";
-        String city = o.getJSONArray("users").getJSONObject(0).getString("location").split(",\\s\\w+")[0];
-        String cmd = String.format("geocode '%s' --provider arcgis", city);
-        Runtime run = Runtime.getRuntime();
-        Process pr = null;
+        //System.out.println(o.getJSONObject("includes"));
+        if(o.getJSONObject("includes").getJSONArray("users").getJSONObject(0).has("location")) {
+            String city = o.getJSONObject("includes").getJSONArray("users").getJSONObject(0).getString("location").split(",\\s\\w+")[0];
+            System.out.println(city + " -> " + o.getJSONObject("data").getString("lang"));
 
-        try {
-            pr = run.exec(cmd);
-            pr.waitFor();
-            BufferedReader buf = new BufferedReader(new InputStreamReader(pr.getInputStream()));
-            country = new JSONObject(buf.readLine()).getString("address").split(", ")[1];
-        } catch (Exception e) {
-            e.printStackTrace();
+            // pip install geocoder -> to make the command work
+            String cmd = String.format("geocode '%s' --provider arcgis", city);
+            Runtime run = Runtime.getRuntime();
+            Process pr = null;
+
+            try {
+                pr = run.exec(cmd);
+                pr.waitFor();
+                BufferedReader buf = new BufferedReader(new InputStreamReader(pr.getInputStream()));
+                String[] asd = new JSONObject(buf.readLine()).getString("address").split(", ");
+                country = asd.length == 1 ? asd[0] : asd[1];
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            update(countries, country);
         }
-
-        update(countries, country);
     }
 
     @Override

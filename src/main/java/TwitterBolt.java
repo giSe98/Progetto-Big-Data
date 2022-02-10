@@ -120,10 +120,10 @@ public class TwitterBolt extends BaseRichBolt {
         String country = "";
         //System.out.println(o.getJSONObject("includes"));
         if(o.getJSONObject("includes").getJSONArray("users").getJSONObject(0).has("location")) {
-            String city = o.getJSONObject("includes").getJSONArray("users").getJSONObject(0).getString("location").split(",\\s\\w+")[0];
-            System.out.println(city + " -> " + o.getJSONObject("data").getString("lang"));
+            String city = o.getJSONObject("includes").getJSONArray("users").getJSONObject(0).getString("location");
+            //System.out.println(city + " -> " + o.getJSONObject("data").getString("lang"));
 
-            // pip install geocoder -> to make the command work
+            // pip install geopy -> to make the command work
             String cmd = String.format("python -c \"import sys;from geopy.geocoders import Nominatim;print(str(Nominatim(user_agent='geoapiExercises').geocode(sys.argv[1], language='en')).split(', ')[-1])\" \"%s\"", city);
             Runtime run = Runtime.getRuntime();
             Process pr = null;
@@ -133,6 +133,7 @@ public class TwitterBolt extends BaseRichBolt {
                 pr.waitFor();
                 BufferedReader buf = new BufferedReader(new InputStreamReader(pr.getInputStream()));
                 country = buf.readLine();
+                if (country.equals("None")) System.out.println("VALORE NONE -> " + o.getJSONObject("includes"));
             } catch (Exception e) {
                 e.printStackTrace();
             }

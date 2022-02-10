@@ -1,0 +1,80 @@
+<style>
+  *,
+  *:before,
+  *:after{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: "Poppins",sans-serif;
+    font-size: 43px;
+    font-weight: 500;
+  }
+  body{
+    display: grid;
+    place-items: center;
+  }
+  .wrapper{
+    padding-top: 16px;
+    box-sizing: border-box;
+    /*border: 1px solid red;*/
+    height: 80px;
+    display: flex;
+  } 
+  .words{
+    overflow: hidden;
+    
+  }
+  span{
+    display: block;
+    height: 110%;
+    padding-top: 10px;
+    /*border: 1px solid orange;*/
+    animation: spin 35s infinite;
+    color: white;
+    text-align: center;
+  }
+  @keyframes spin {
+    10%{
+      transform: translateY(-112%);
+    }
+    25%{
+      transform: translateY(-100%);
+    }
+    35%{
+      transform: translateY(-212%);
+    }
+    50%{
+      transform: translateY(-200%);
+    }
+    60%{
+      transform: translateY(-312%);
+    }
+    75%{
+      transform: translateY(-300%);
+    }
+    85%{
+      transform: translateY(-412%);
+    }
+    100%{
+      transform: translateY(-400%);
+    }
+  }
+
+  .center{
+    margin: auto;
+  }
+</style>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&disply=swap" rel="stylesheet">
+
+<nav class=" navbar navbar-expand-lg navbar-absolute navbar-transparent">
+  <div class="wrapper center">
+    <div class="words stylesheet">
+      <a href="https://github.com/giSe98/Progetto-Big-Data.git"><span>Analisi statistiche sul covid</span></a>
+      <a href="https://github.com/giSe98/Progetto-Big-Data.git"><span>Modelli e Tecniche per i Big Data</span></a>
+      <a href="https://github.com/giSe98/Progetto-Big-Data.git"><span>Analisi statistiche sul covid</span></a>
+      <a href="https://github.com/giSe98/Progetto-Big-Data.git"><span>Modelli e Tecniche per i Big Data</span></a>
+      <a href="https://github.com/giSe98/Progetto-Big-Data.git"><span>Analisi statistiche sul covid</span></a>
+    </div>
+  </div>
+</nav>

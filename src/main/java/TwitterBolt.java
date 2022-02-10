@@ -117,7 +117,6 @@ public class TwitterBolt extends BaseRichBolt {
     }
 
     private void getCountry(JSONObject o) {
-        //TODO se è Giapponese/Cinese/linguaggi con simboli si deve tradurre in inglese -> https://stackoverflow.com/questions/8147284/how-to-use-google-translate-api-in-my-java-application
         String country = "";
         //System.out.println(o.getJSONObject("includes"));
         if(o.getJSONObject("includes").getJSONArray("users").getJSONObject(0).has("location")) {
@@ -125,7 +124,7 @@ public class TwitterBolt extends BaseRichBolt {
             System.out.println(city + " -> " + o.getJSONObject("data").getString("lang"));
 
             // pip install geocoder -> to make the command work
-            String cmd = String.format("geocode '%s' --provider arcgis", city);
+            String cmd = String.format("python -c \"import sys;from geopy.geocoders import Nominatim;print(str(Nominatim(user_agent='geoapiExercises').geocode(sys.argv[1], language='en')).split(', ')[-1])\" \"%s\"", city);
             Runtime run = Runtime.getRuntime();
             Process pr = null;
 
@@ -133,8 +132,7 @@ public class TwitterBolt extends BaseRichBolt {
                 pr = run.exec(cmd);
                 pr.waitFor();
                 BufferedReader buf = new BufferedReader(new InputStreamReader(pr.getInputStream()));
-                String[] asd = new JSONObject(buf.readLine()).getString("address").split(", ");
-                country = asd.length == 1 ? asd[0] : asd[1];
+                country = buf.readLine();
             } catch (Exception e) {
                 e.printStackTrace();
             }

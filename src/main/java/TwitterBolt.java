@@ -1,3 +1,4 @@
+import com.sun.xml.bind.v2.TODO;
 import edu.stanford.nlp.pipeline.CoreDocument;
 import edu.stanford.nlp.pipeline.CoreSentence;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
@@ -50,7 +51,7 @@ public class TwitterBolt extends BaseRichBolt {
             //stampa sentimenti analysys
             System.out.println("P= "+valoriAnalisi.get("Positive")+" N= "+valoriAnalisi.get("Negative")+" neutral= "+valoriAnalisi.get("Neutral"));
             System.out.println("--------------------------------------------------------------------------------");
-            //stampa più famoso retweet con valori di like ecommenti
+            //stampa più famoso retweet con valori di like e commenti
             System.out.println("tweet più retweettato: "+retweetObj.getJSONObject("includes").getJSONArray("tweets").getJSONObject(0).getString("text"));
             System.out.println("num like= "+retweetObj.getJSONObject("includes").getJSONArray("tweets").getJSONObject(0).getJSONObject("public_metrics").getString("like_count")+ " num reply= "+retweetObj.getJSONObject("includes").getJSONArray("tweets").getJSONObject(0).getJSONObject("public_metrics").getString("reply_count"));
             System.out.println("--------------------------------------------------------------------------------");
@@ -88,6 +89,8 @@ public class TwitterBolt extends BaseRichBolt {
 
         //query su location dell'utente
         getCountry(o);
+
+        //TODO Ampliare SentimentAnalysis, nazionalità più attiva e like count
 
         i++;
         collector.emit("stream", new Values(input.getString(0)));

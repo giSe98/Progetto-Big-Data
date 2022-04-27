@@ -14,13 +14,11 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class TwitterBolt extends BaseRichBolt {
     private OutputCollector collector;
+
     private final int numTweet=20;
     private ArrayList<JSONObject> tweets = new ArrayList<>();
     private int i=0; //indice tweet
@@ -34,6 +32,7 @@ public class TwitterBolt extends BaseRichBolt {
     private int bestR = Integer.MIN_VALUE; // indice retweet
     private JSONObject retweetObj; // object
     private int retweet = 0;
+    private String best_country="";
 
     @Override
     public void prepare(Map<String, Object> topoConf, TopologyContext context, OutputCollector collector) {
@@ -67,6 +66,9 @@ public class TwitterBolt extends BaseRichBolt {
             countries.entrySet().forEach(entry->{
                 System.out.println(entry.getKey()+" "+entry.getValue());
             });
+            System.out.println("--------------------------------------------------------------------------------");
+            //stampa best countries
+            System.out.println("best_country -> " + best_country);
             System.exit(0);
         }
 
@@ -89,8 +91,11 @@ public class TwitterBolt extends BaseRichBolt {
 
         //query su location dell'utente
         getCountry(o);
+        best_country = Collections.max(countries.entrySet(), Comparator.comparingInt(Map.Entry::getValue)).getKey();
 
         //TODO Ampliare SentimentAnalysis, nazionalità più attiva e like count
+        //nazionalità più attiva fatta
+        //controllare il perchè ogni tanto il get country da null pointer exception
 
         i++;
         collector.emit("stream", new Values(input.getString(0)));

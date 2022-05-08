@@ -19,7 +19,7 @@ import java.util.*;
 public class TwitterBolt extends BaseRichBolt {
     private OutputCollector collector;
 
-    private final int numTweet=20;
+    private final int numTweet=100;
     private ArrayList<JSONObject> tweets = new ArrayList<>();
     private int i=0; //indice tweet
 
@@ -33,6 +33,7 @@ public class TwitterBolt extends BaseRichBolt {
     private JSONObject retweetObj; // object
     private int retweet = 0;
     private String best_country="";
+    private int best_like = 0; //dovrebbe contare il numero di like di ogni tweet e restituire quello migliore ma da null pointer exception
 
     @Override
     public void prepare(Map<String, Object> topoConf, TopologyContext context, OutputCollector collector) {
@@ -69,6 +70,7 @@ public class TwitterBolt extends BaseRichBolt {
             System.out.println("--------------------------------------------------------------------------------");
             //stampa best countries
             System.out.println("best_country -> " + best_country);
+
             System.exit(0);
         }
 
@@ -89,11 +91,13 @@ public class TwitterBolt extends BaseRichBolt {
         String source = o.getJSONObject("data").getString("source");
         update(device, source);
 
-        //query su location dell'utente
+        //query su location dell'utente e sulla location più attiva
         getCountry(o);
+        countries.remove("null");
+        countries.remove("None");
         best_country = Collections.max(countries.entrySet(), Comparator.comparingInt(Map.Entry::getValue)).getKey();
 
-        //TODO Ampliare SentimentAnalysis, nazionalità più attiva e like count
+        //TODO Ampliare SentimentAnalysis e like count
         //nazionalità più attiva fatta
         //controllare il perchè ogni tanto il get country da null pointer exception
 

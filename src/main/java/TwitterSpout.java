@@ -24,7 +24,7 @@ import java.util.Map;
 public class TwitterSpout extends BaseRichSpout {
     private SpoutOutputCollector spoutOutputCollector;
     private int i = 0; //indice tweet
-    private final int numTweet=20;
+    private final int numTweet=100;
     private BufferedReader reader;
     private TopologyContext contex;
     private URIBuilder uriBuilder;

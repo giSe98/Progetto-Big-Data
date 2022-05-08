@@ -34,6 +34,7 @@ public class TwitterBolt extends BaseRichBolt {
     private int retweet = 0;
     private String best_country="";
     private int best_like = 0; //dovrebbe contare il numero di like di ogni tweet e restituire quello migliore ma da null pointer exception
+    private JSONObject likeObj; // object
 
     @Override
     public void prepare(Map<String, Object> topoConf, TopologyContext context, OutputCollector collector) {
@@ -55,6 +56,8 @@ public class TwitterBolt extends BaseRichBolt {
             System.out.println("tweet più retweettato: "+retweetObj.getJSONObject("includes").getJSONArray("tweets").getJSONObject(0).getString("text"));
             System.out.println("num like= "+retweetObj.getJSONObject("includes").getJSONArray("tweets").getJSONObject(0).getJSONObject("public_metrics").getString("like_count")+ " num reply= "+retweetObj.getJSONObject("includes").getJSONArray("tweets").getJSONObject(0).getJSONObject("public_metrics").getString("reply_count"));
             System.out.println("--------------------------------------------------------------------------------");
+            //stampa tweet con più like
+            System.out.println("tweet con più like: "+likeObj.getJSONObject("includes").getJSONArray("tweets").getJSONObject(0).getString("text")+" numLike: "+best_like);
             //stampa device
             device.entrySet().forEach(entry->{
                 System.out.println(entry.getKey()+" "+entry.getValue());
@@ -75,7 +78,6 @@ public class TwitterBolt extends BaseRichBolt {
         }
 
         String line = input.getString(0);
-        //System.out.println(line);
         JSONObject o = new JSONObject(line);
         if(o.getJSONObject("data").getString("lang").equals("en")) {
             String dato = o.getJSONObject("data").getString("text");
@@ -84,8 +86,11 @@ public class TwitterBolt extends BaseRichBolt {
             valoriAnalisi.put(sentiment,valoriAnalisi.get(sentiment)+1);
         }
 
-        //query sui tweet
+        //query per i retweet
         checkRetweet(o);
+
+        //query per i like
+        bestLike(o);
 
         //query sul tipo di device
         String source = o.getJSONObject("data").getString("source");
@@ -98,8 +103,6 @@ public class TwitterBolt extends BaseRichBolt {
         best_country = Collections.max(countries.entrySet(), Comparator.comparingInt(Map.Entry::getValue)).getKey();
 
         //TODO Ampliare SentimentAnalysis e like count
-        //nazionalità più attiva fatta
-        //controllare il perchè ogni tanto il get country da null pointer exception
 
         i++;
         collector.emit("stream", new Values(input.getString(0)));
@@ -121,6 +124,16 @@ public class TwitterBolt extends BaseRichBolt {
         }
     }
 
+    private void bestLike(JSONObject o) {
+        if(o.getJSONObject("includes").has("tweets")){
+            int c = Integer.parseInt(o.getJSONObject("includes").getJSONArray("tweets").getJSONObject(0).getJSONObject("public_metrics").getString("like_count"));
+            if (c > best_like) {
+                best_like = c;
+                likeObj = o;
+            }
+        }
+    }
+
     private void update(Map<String, Integer> map, String source) {
         if (map.containsKey(source))
             map.put(source, map.get(source) + 1);
@@ -133,7 +146,6 @@ public class TwitterBolt extends BaseRichBolt {
         //System.out.println(o.getJSONObject("includes"));
         if(o.getJSONObject("includes").getJSONArray("users").getJSONObject(0).has("location")) {
             String city = o.getJSONObject("includes").getJSONArray("users").getJSONObject(0).getString("location");
-            //System.out.println(city + " -> " + o.getJSONObject("data").getString("lang"));
 
             // pip install geopy -> to make the command work
             String cmd = String.format("python -c \"import sys;from geopy.geocoders import Nominatim;print(str(Nominatim(user_agent='geoapiExercises').geocode(sys.argv[1], language='en')).split(', ')[-1])\" \"%s\"", city);
@@ -145,7 +157,7 @@ public class TwitterBolt extends BaseRichBolt {
                 pr.waitFor();
                 BufferedReader buf = new BufferedReader(new InputStreamReader(pr.getInputStream()));
                 country = buf.readLine();
-                if (country.equals("None")) System.out.println("VALORE NONE -> " + o.getJSONObject("includes"));
+                //if (country.equals("None")) System.out.println("VALORE NONE -> " + o.getJSONObject("includes"));
             } catch (Exception e) {
                 e.printStackTrace();
             }

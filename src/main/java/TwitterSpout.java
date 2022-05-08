@@ -62,9 +62,6 @@ public class TwitterSpout extends BaseRichSpout {
         try {
             String line = reader.readLine();
             if(line != null && i < numTweet) {
-                //JSONObject o = new JSONObject(line);
-                //System.out.println(Integer.parseInt(o.getJSONObject("includes").getJSONArray("tweets").getJSONObject(0).getJSONObject("public_metrics").getString("like_count")));
-                //System.exit(0);
                 this.spoutOutputCollector.emit("stream", new Values(line));
                 i++;
             }

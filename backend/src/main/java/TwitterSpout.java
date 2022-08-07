@@ -24,7 +24,7 @@ import java.util.Map;
 public class TwitterSpout extends BaseRichSpout {
     private SpoutOutputCollector spoutOutputCollector;
     private int i = 0; //indice tweet
-    private final int numTweet=100;
+    private final int numTweet=400;
     private BufferedReader reader;
     private TopologyContext contex;
     private URIBuilder uriBuilder;
@@ -44,9 +44,9 @@ public class TwitterSpout extends BaseRichSpout {
             HttpGet httpGet = new HttpGet(uriBuilder.build());
             httpGet.setHeader("Authorization", String.format("Bearer %s", bearer));
 
-//            Map<String, String> rules1 = new HashMap<>();
-//            rules1.put("context:123.1220701888179359745", "covid");
-//            TwitterStream.setupRules(rules1);
+            Map<String, String> rules1 = new HashMap<>();
+            rules1.put("context:123.1220701888179359745", "covid");
+            TwitterStream.setupRules(rules1);
 
             HttpResponse response = client.execute(httpGet);
             HttpEntity entity = response.getEntity();

@@ -1,7 +1,9 @@
-import com.sun.xml.bind.v2.TODO;
+import Test.Pipeline;
 import edu.stanford.nlp.pipeline.CoreDocument;
 import edu.stanford.nlp.pipeline.CoreSentence;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -22,7 +24,7 @@ import java.util.*;
 public class TwitterBolt extends BaseRichBolt {
     private OutputCollector collector;
 
-    private final int numTweet=100;
+    private final int numTweet=10;
     private ArrayList<JSONObject> tweets = new ArrayList<>();
     private int i=0; //indice tweet
     private int j=0; //indice tweet con geolocalizzazione
@@ -40,12 +42,6 @@ public class TwitterBolt extends BaseRichBolt {
     private int best_like = 0; //dovrebbe contare il numero di like di ogni tweet e restituire quello migliore ma da null pointer exception
     private JSONObject likeObj; // object
 
-    //per la connessione http
-    public String endpointD = "http://localhost:4200/#/dashboard";
-    public String endpointI = "http://localhost:4200/#/interesse";
-    public URI uriD = URI.create(endpointD);
-    public URI uriI = URI.create(endpointI);
-
     //per l'utilizzo del file
     public File file;
     public String path = "./backend/result.txt";
@@ -62,16 +58,6 @@ public class TwitterBolt extends BaseRichBolt {
     @Override
     public void execute(Tuple input) {
         if(input.getString(0).equals("tweet finiti")){
-            CloseableHttpClient httpclient = HttpClients.createDefault();
-            HttpPost httppost = new HttpPost("http://localhost:8080/prova");
-            StringEntity entity = null;
-            try {
-                entity = new StringEntity(new String("ciao"));
-            } catch (UnsupportedEncodingException e) {
-                throw new RuntimeException(e);
-            }
-            httppost.setEntity(entity);
-            httppost.setHeader("Content-type", "application/json");
             System.out.println("--------------------------------------------------------------------------------");
             //stampa sentimenti analysys
             System.out.println("P= "+valoriAnalisi.get("Positive")+" N= "+valoriAnalisi.get("Negative")+" neutral= "+valoriAnalisi.get("Neutral"));
@@ -96,54 +82,42 @@ public class TwitterBolt extends BaseRichBolt {
             });
             System.out.println("--------------------------------------------------------------------------------");
             //stampa best countries
+            String json = createString(countries);
+            sendData(json, "/interesse/device");
             System.out.println("best_country -> " + best_country);
-
-            /*
-            file = new File(path);
-            FileWriter fw = null;
-            try {
-                fw = new FileWriter(file,true);
-                fw.write(String.valueOf("tweet analizzati: "+i+" tweet con geolocalizzazione: "+j+"\n"));
-                fw.flush();
-                fw.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            */
-
             System.exit(0);
         }
 
-        String line = input.getString(0);
-        JSONObject o = new JSONObject(line);
+        try {
+            String line = input.getString(0);
+            JSONObject o = new JSONObject(line);
 
-        //richiamo metodo per scrivere sul file
-        //scrivi(o);
+            //richiamo metodo per scrivere sul file
+            //scrivi(o);
 
-        if(o.getJSONObject("data").getString("lang").equals("en")) {
-            String dato = o.getJSONObject("data").getString("text");
-            dato = clear(dato);
-            String sentiment = analysis(dato);
-            valoriAnalisi.put(sentiment,valoriAnalisi.get(sentiment)+1);
-        }
+            if (o.getJSONObject("data").getString("lang").equals("en")) {
+                String dato = o.getJSONObject("data").getString("text");
+                dato = clear(dato);
+                String sentiment = analysis(dato);
+                valoriAnalisi.put(sentiment, valoriAnalisi.get(sentiment) + 1);
+            }
 
-        //query per i retweet
-        checkRetweet(o);
+            //query per i retweet
+            checkRetweet(o);
 
-        //query per i like
-        bestLike(o);
+            //query per i like
+            bestLike(o);
 
-        //query sul tipo di device
-        String source = o.getJSONObject("data").getString("source");
-        update(device, source);
+            //query sul tipo di device
+            String source = o.getJSONObject("data").getString("source");
+            update(device, source);
 
-        //query su location dell'utente e sulla location più attiva
-        getCountry(o);
-        countries.remove("null");
-        countries.remove("None");
-        best_country = Collections.max(countries.entrySet(), Comparator.comparingInt(Map.Entry::getValue)).getKey();
-
-        //TODO Ampliare SentimentAnalysis e like count
+            //query su location dell'utente e sulla location più attiva
+            getCountry(o);
+            countries.remove("null");
+            countries.remove("None");
+            best_country = Collections.max(countries.entrySet(), Comparator.comparingInt(Map.Entry::getValue)).getKey();
+        } catch (Exception e) {}
 
         i++;
         collector.emit("stream", new Values(input.getString(0)));
@@ -177,6 +151,58 @@ public class TwitterBolt extends BaseRichBolt {
             }
         }
         else i++;
+    }
+
+    private void sendData(String json, String endpoint) {
+        CloseableHttpClient httpclient = HttpClients.createDefault();
+        HttpPost httppost = new HttpPost("http://localhost:8080" + endpoint);
+        StringEntity entity = null;
+        try {
+            entity = new StringEntity(json);
+            httppost.setEntity(entity);
+        } catch (UnsupportedEncodingException e1) {
+            e1.printStackTrace();
+        }
+
+        httppost.setHeader("Content-type", "application/json");
+
+        //Execute and get the response.
+        CloseableHttpResponse body = null;
+        try {
+            body = httpclient.execute(httppost);
+            body.close();
+            System.out.println("BODY: " + body);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        HttpEntity entity1 = body.getEntity();
+
+        if (entity1 != null) {
+            try (InputStream instream = entity.getContent()) {
+                // do something useful
+            } catch (UnsupportedOperationException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+    }
+    private String createString(Map<String, Integer> countries) {
+        String ret = "{";
+        int count = 0;
+        int size = countries.size();
+
+        for (Map.Entry<String, Integer> entry : countries.entrySet()) {
+            ret += "\"" + entry.getKey() + "\": " + entry.getValue();
+            if (count < size - 1) ret += ", ";
+            count++;
+        }
+        ret += "}";
+
+        return ret;
     }
 
     private void checkRetweet(JSONObject o) {

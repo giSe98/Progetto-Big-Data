@@ -18,6 +18,12 @@ export const ROUTES: RouteInfo[] = [
     title: "Interesse",
     icon: "icon-atom",
     class: ""
+  },
+  {
+    path: "/maps",
+    title: "Maps",
+    icon: "icon-globe-2",
+    class: ""
   }/*,
   {
     path: "/politica",

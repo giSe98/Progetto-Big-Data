@@ -1,0 +1,150 @@
+<style>
+  .wrap-header{
+    border: 10px solid #27293d;
+    padding-left: 103px;
+    font-size: 45px;
+  }
+
+  .wrap-map{
+    padding-left: 5px;
+  }
+  
+  .wrap-legend{
+    border: 5px solid #27293d;
+    background: #27293d;
+  }
+
+  .table{
+    color: #FFFFFFB3
+  }
+</style>
+
+<div class="content">
+  <div class=" row">
+      <div class="col-sm"></div>
+      <div class="card col-sm-6">
+        <div class="card-header wrap-header">Analisi in real time</div>
+        <div class="card-body wrap-map">
+          <igx-geographic-map #mapRealTime
+            width="580px"
+            height="580px"
+            zoomable="true" >
+          </igx-geographic-map>
+
+          <ng-template let-series="series" let-item="item" #templateRealTime>
+              <div>
+                <span>{{item.name}}</span>
+              </div>
+          </ng-template>
+      </div>
+    </div>
+    <div class="col-sm"></div>
+  </div>
+  <div class=" row">
+    <div class="card">
+      <div class=" card-body">
+        <div class=" table-responsive">
+          <table class=" table tablesorter" id="">
+            <thead class=" text-primary">
+              <tr>
+                <th *ngFor="let a of countriesRealTime">
+                  {{a}}
+                </th>
+                <!--
+                <th>ID</th>
+                <th>WHO</th>
+                <th>WHEN</th>
+                <th>WHAT</th>
+                <th class=" text-center">SENTIMENT</th>
+                -->
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th *ngFor="let a of valuesRealTime">
+                  {{a}}
+                </th>
+                <!--
+                <td>1467810672</td>
+                <td>Niger</td>
+                <td>Oud-Turnhout</td>
+                <td>Oud-Turnhout</td>
+                <td class=" text-center">POS</td>-->
+              </tr>
+              
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  
+    <!--
+    <div class="col-sm"></div>
+    <div class="col-sm-6 wrap-legend">ASD</div>
+    <div class="col-sm"></div>
+  -->
+  </div>
+  <div class=" row">
+    <div class="col-sm"></div>
+    <div class="card col-sm-6">
+      <div class="card-header wrap-header">Analisi in batch</div>
+      <div class="card-body wrap-map">
+        <igx-geographic-map #map
+          width="580px"
+          height="580px"
+          zoomable="true" >
+        </igx-geographic-map>
+
+        <ng-template let-series="series" let-item="item" #template>
+            <div>
+              <span>{{item.name}}</span>
+            </div>
+        </ng-template>
+    </div>
+  </div>
+  <div class="col-sm"></div>
+</div>
+<div class=" row">
+  <div class="card">
+    <div class=" card-body">
+      <div class=" table-responsive">
+        <table class=" table tablesorter" id="">
+          <thead class=" text-primary">
+            <tr>
+              <th *ngFor="let a of countries">
+                {{a}}
+              </th>
+              <!--
+              <th>ID</th>
+              <th>WHO</th>
+              <th>WHEN</th>
+              <th>WHAT</th>
+              <th class=" text-center">SENTIMENT</th>-->
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th *ngFor="let a of values">
+                {{a}}
+              </th>
+              <!--
+              <td>1467810672</td>
+              <td>Niger</td>
+              <td>Oud-Turnhout</td>
+              <td>Oud-Turnhout</td>
+              <td class=" text-center">POS</td>-->
+            </tr>
+            
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!--
+  <div class="col-sm"></div>
+  <div class="col-sm-6 wrap-legend">ASD</div>
+  <div class="col-sm"></div>
+-->
+</div>
+</div>

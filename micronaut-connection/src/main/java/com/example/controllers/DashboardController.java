@@ -4,53 +4,46 @@ import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Post;
+import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 @Controller("/dashboard")
 public class DashboardController {
-    private HashMap<String, HashMap<String, Integer>> numTweetMesi = new HashMap<>();
+    private HashMap<String, JSONObject> tweets = new HashMap<>();
+    private JSONObject jsonObject = new JSONObject();
 
     public DashboardController() {
     }
 
-    @Get(value="/numTweetMesePro",produces = MediaType.TEXT_PLAIN)
-    public List<Integer> numTweetMesePro() {
-        int mese = Calendar.getInstance().get(Calendar.MONTH);
-
-        List<Integer> num = new ArrayList<>();
-        for(int i = 0; i < mese; i++)
-            num.add(0);
-
-        numTweetMesi.get("pro").forEach((key, value) -> num.add(value));
-
-        return num;
+    @Get(value="/tweets",produces = MediaType.TEXT_PLAIN)
+    public String getTweets() {
+        return this.tweets.values().toString();
     }
 
-    @Post(value="/numTweetMesePro",produces = MediaType.TEXT_PLAIN)
-    public void numTweetMesePro(HashMap<String, Integer> tweet) {
-        numTweetMesi.put("pro", tweet);
+    @Post(value="/tweets",produces = MediaType.TEXT_PLAIN)
+    public void getTweets(HashMap<String, String> tweets) {
+        jsonObject = new JSONObject(tweets);
+        System.out.println(tweets);
+        System.out.println(jsonObject);
+
+        this.tweets = update(jsonObject, this.tweets);
     }
 
-    @Get(value="/numTweetMeseContro",produces = MediaType.TEXT_PLAIN)
-    public List<Integer> numTweetMeseContro() {
-        int mese = Calendar.getInstance().get(Calendar.MONTH);
+    private HashMap<String, JSONObject> update(JSONObject jsonObject, HashMap<String, JSONObject> hashMap) {
+        Iterator<String> keys = jsonObject.keys();
 
-        List<Integer> num = new ArrayList<>();
-        for(int i = 0; i < mese; i++)
-            num.add(0);
+        while(keys.hasNext()) {
+            String key = keys.next();
 
-        numTweetMesi.get("contro").forEach((key, value) -> num.add(value));
-
-        return num;
+            if (!tweets.containsKey(key)) {
+                JSONObject value = new JSONObject(new String(Base64.getDecoder().decode((String) jsonObject.get(key))));
+//                System.out.println(value);
+                tweets.put(key, value);
+            }
+        }
+//
+        System.out.println(hashMap);
+        return hashMap;
     }
-
-    @Post(value="/numTweetMeseContro",produces = MediaType.TEXT_PLAIN)
-    public void numTweetMeseContro(HashMap<String, Integer> tweet) {
-        numTweetMesi.put("contro", tweet);
-    }
-
 }

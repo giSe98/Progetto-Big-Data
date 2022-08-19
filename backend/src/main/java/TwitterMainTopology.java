@@ -15,7 +15,7 @@ public class TwitterMainTopology {
 
         try (LocalCluster cluster = new LocalCluster()) {
             cluster.submitTopology("Twitter", config, builder.createTopology());
-            Utils.sleep(600000); // wait [param] ms
+            Thread.sleep(600000); // wait [param] ms
             cluster.killTopology("Twitter");
             cluster.shutdown();
         } catch (Exception e) {

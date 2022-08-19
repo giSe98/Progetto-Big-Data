@@ -6,6 +6,7 @@ import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Post;
 import org.json.JSONObject;
 
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -13,6 +14,8 @@ import java.util.Iterator;
 public class InteresseController {
     private HashMap<String, Integer> device = new HashMap<>();
     private HashMap<String, Integer> lang = new HashMap<>();
+    private JSONObject bestRetweet = new JSONObject();
+    private JSONObject bestLike = new JSONObject();
 
     private JSONObject jsonObject = new JSONObject();
 
@@ -36,6 +39,30 @@ public class InteresseController {
         jsonObject = new JSONObject(lang);
         //System.out.println(jsonObject);
         this.lang = update(jsonObject, this.lang);
+    }
+
+    @Get(value="/bestRetweet",produces = MediaType.TEXT_PLAIN)
+    public String bestRetweet() { return this.bestRetweet.toString(); }
+
+    @Post(value="/bestRetweet",produces = MediaType.TEXT_PLAIN)
+    public void bestRetweet(String tweet) {
+        jsonObject = new JSONObject(new String(Base64.getDecoder().decode(tweet)));
+        System.out.println(jsonObject);
+
+        if(this.bestRetweet.isEmpty() || this.bestRetweet.getInt("retweet_count") <= jsonObject.getInt("retweet_count"))
+            this.bestRetweet = jsonObject;
+    }
+
+    @Get(value="/bestLike",produces = MediaType.TEXT_PLAIN)
+    public String bestLike() { return this.bestLike.toString(); }
+
+    @Post(value="/bestLike",produces = MediaType.TEXT_PLAIN)
+    public void bestLike(String tweet) {
+        jsonObject = new JSONObject(new String(Base64.getDecoder().decode(tweet)));
+        System.out.println(jsonObject);
+
+        if(this.bestLike.isEmpty() || this.bestLike.getInt("like_count") <= jsonObject.getInt("like_count"))
+            this.bestLike = jsonObject;
     }
 
     private HashMap<String, Integer> update(JSONObject jsonObject, HashMap<String, Integer> hashMap) {

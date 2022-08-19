@@ -58,6 +58,7 @@ public class TwitterSpout extends BaseRichSpout {
     public void nextTuple() {
         try {
             String line = reader.readLine();
+            System.out.println(line);
             if(line != null && i < numTweet) {
                 this.spoutOutputCollector.emit("stream", new Values(line));
                 i++;

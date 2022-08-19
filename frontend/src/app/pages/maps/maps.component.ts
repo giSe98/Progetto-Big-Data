@@ -1,3 +1,4 @@
+import { DashboardComponent } from './../dashboard/dashboard.component';
 import { AfterViewInit, Component, TemplateRef, ViewChild, OnInit } from "@angular/core";
 import { IgxSizeScaleComponent } from "igniteui-angular-charts";
 import { IgxValueBrushScaleComponent } from "igniteui-angular-charts";
@@ -5,9 +6,7 @@ import { MarkerType } from "igniteui-angular-charts";
 import { IgxShapeDataSource } from "igniteui-angular-core";
 import { IgxGeographicMapComponent } from "igniteui-angular-maps";
 import { IgxGeographicProportionalSymbolSeriesComponent } from "igniteui-angular-maps";
-
-import { WorldLocations } from "./WorldLocations";
-import { WorldLocationsRealTime } from './WorldLocationsRealTime';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: "app-maps",
@@ -21,28 +20,54 @@ export class MapsComponent implements AfterViewInit {
     @ViewChild("template", { static: true })
     public tooltipTemplate: TemplateRef<object>;
 
-    @ViewChild("mapRealTime", { static: true })
-    public mapRealTime: IgxGeographicMapComponent;
-    @ViewChild("templateRealTime", { static: true })
-    public tooltipTemplateRealTime: TemplateRef<object>;
+    @ViewChild("mapRelativePositions", { static: true })
+    public mapRelativePositions: IgxGeographicMapComponent;
+    @ViewChild("templateRelativePositions", { static: true })
+    public tooltipTemplateRelativePositions: TemplateRef<object>;
 
-    public countries: any[] = [];
-    public values: any[] = [];
+    public relativePositions: any[] = [];
+    public countriesRelativePositions: any[] = [];
+    public valuesRelativePositions: any[] = [];
 
-    public countriesRealTime: any[] = [];
-    public valuesRealTime: any[] = [];
+    public realPositions: any[] = [];
+    public countriesRealPositions: any[] = [];
+    public valuesRealPositions: any[] = [];
 
-    constructor() {}
+    public percentage: number;
+    public total: number;
+
+    constructor(private http: HttpClient) {}
 
     public ngAfterViewInit(): void {
+      this.http.get<any>("http://localhost:8080/maps/relativePositions").subscribe(res => {
+        this.relativePositions = res;
+        for (let i = 0; i < this.relativePositions.length; i++) {
+          var a = atob(this.relativePositions[i].name);
+          this.relativePositions[i].name = a;
+        }
+      });
+
+      this.http.get<any>("http://localhost:8080/maps/realPositions").subscribe(res => {
+        this.realPositions = res;
+        for (let i = 0; i < this.realPositions.length; i++) {
+          var a = atob(this.realPositions[i].name);
+          this.realPositions[i].name = a;
+        }
+      });
+
+      this.http.get<any>("http://localhost:8080/dashboard/tweets").subscribe(res => {
+        this.total = res.length;
+      });
+
+
         const sds = new IgxShapeDataSource();
-        sds.importCompleted.subscribe(() => this.onDataLoaded(sds, "normal"));
-        sds.shapefileSource = "https://static.infragistics.com/xplatform/shapes/WorldCities.shp";
-        sds.databaseSource  = "https://static.infragistics.com/xplatform/shapes/WorldCities.dbf";
+        sds.importCompleted.subscribe(() => this.onDataLoaded(sds, "real"));
+        sds.shapefileSource = "https://static.infragistics.com/xplatform/shapes/WorldTemperatures.shp";
+        sds.databaseSource  = "https://static.infragistics.com/xplatform/shapes/WorldTemperatures.dbf";
         sds.dataBind();
 
         const sds2 = new IgxShapeDataSource();
-        sds2.importCompleted.subscribe(() => this.onDataLoaded(sds2, "real time"));
+        sds2.importCompleted.subscribe(() => this.onDataLoaded(sds2, "relative"));
         sds2.shapefileSource = "https://static.infragistics.com/xplatform/shapes/WorldCities.shp";
         sds2.databaseSource  = "https://static.infragistics.com/xplatform/shapes/WorldCities.dbf";
         sds2.dataBind();
@@ -56,7 +81,7 @@ export class MapsComponent implements AfterViewInit {
         for (const record of shapeRecords) {
             const temp = record.fieldValues.Contour;
             // using only major contours (every 10th degrees Celsius)
-            if (temp % 10 === 0 && temp >= 0) {
+            if (temp % 15 === 0 && temp >= 0) {
                 for (const shapes of record.points) {
                     for (let i = 0; i < shapes.length; i++) {
                         if (i % 5 === 0) {
@@ -70,11 +95,10 @@ export class MapsComponent implements AfterViewInit {
         }
 
         // console.log("loaded contour points: " + contourPoints.length);
-        if (e === "normal") {
-          this.addSeriesWith(WorldLocations.getAll(), e);
-          
-        } else if (e === "real time") {
-          this.addSeriesWith(WorldLocationsRealTime.getAll(), e);
+        if (e === "real") { 
+          this.addSeriesWith(this.realPositions, e);
+        } else if (e === "relative") {
+          this.addSeriesWith(this.relativePositions, e);
         }
     }
 
@@ -107,16 +131,39 @@ export class MapsComponent implements AfterViewInit {
         symbolSeries.markerOutline = "rgba(0,0,0,0.3)";
 
 
-        if (e === "normal") {
+        if (e === "real") {
           symbolSeries.tooltipTemplate = this.tooltipTemplate;
           this.map.series.add(symbolSeries);
-          this.countries = WorldLocations.getCountries();
-          this.values = WorldLocations.getCountrySum();
-        } else if (e === "real time") {
-          symbolSeries.tooltipTemplate = this.tooltipTemplateRealTime;
-          this.mapRealTime.series.add(symbolSeries);
-          this.countriesRealTime = WorldLocationsRealTime.getCountries();
-          this.valuesRealTime = WorldLocationsRealTime.getCountrySum();
+          this.countriesRealPositions = this.getCountries(this.realPositions);
+          this.valuesRealPositions = this.getCountrySum(this.realPositions);
+        } else if (e === "relative") {
+          symbolSeries.tooltipTemplate = this.tooltipTemplateRelativePositions;
+          this.mapRelativePositions.series.add(symbolSeries);
+          this.countriesRelativePositions = this.getCountries(this.relativePositions);
+          this.valuesRelativePositions = this.getCountrySum(this.relativePositions);
         }
     }
+
+    private getCountries(loc: any[]): any[] {
+      if(loc.length !== 0) {
+        return loc.map((get) => get.country).filter((v, i, a) => a.indexOf(v) === i);
+      }
+      return [];
+    }
+
+    private getCountrySum(loc: any[]) {
+      let ret = {};
+  
+      loc.forEach(el => {
+        ret[el.country] = (ret[el.country] || 0) + 1;
+      })
+  
+      var values = []
+      for(var k in ret){
+        values.push(ret[k]);
+      }
+  
+      return values;
+    }
+
 }

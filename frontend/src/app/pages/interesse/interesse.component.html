@@ -1,7 +1,38 @@
+<style>
+  .wrap1{
+    border: solid white;
+    height: 570px;
+  }
+
+  .wrap2{
+    padding-left: 465px;
+    width: 1032.8px;
+    top: -3px;
+    position: relative;
+    left: -18px;
+    border: solid white;
+  }
+
+  .wrap3{
+    padding-left: 444px;
+    width: 1032.8px;
+    top: -3px;
+    position: relative;
+    left: -18px;
+    border: solid white;
+  }
+
+  .space{
+    padding-bottom: 30px;
+  }
+</style>
+
+
 <div class=" content">
   <div class=" row">
     <div class=" col"></div>
-    <div class=" col-sm-10">
+    <div class=" col-sm-10 wrap1">
+      <h1 class="wrap2">DEVICES</h1>
       <canvas baseChart 
         [data]="pieChartData" 
         [labels]="pieChartLabels" 
@@ -13,5 +44,89 @@
       </canvas>
     </div>
     <div class=" col"></div>
+  </div>
+  <div class="space"></div>
+  <div class=" row">
+    <div class=" col"></div>
+    <div class=" col-sm-10 wrap1">
+      <h1 class="wrap3">LANGUAGES</h1>
+      <canvas baseChart 
+        [data]="pieChart2Data" 
+        [labels]="pieChart2Labels" 
+        [chartType]="pieChart2Type"
+        [options]="pieChart2Options"
+        [plugins]="pieChart2Plugins"
+        [colors]="pieChart2Colors"
+        [legend]="pieChart2Legend">
+      </canvas>
+    </div>
+    <div class=" col"></div>
+  </div>
+  <div class="space"></div>
+  <div class=" row">
+    <div class="card">
+      <div class=" card-header">
+        <h4 class=" card-title">Most retweeted tweet</h4>
+      </div>
+      <div class="card-body">
+        <div class=" table-responsive">
+          <table class=" table tablesorter" id="">
+            <thead class=" text-primary">
+              <tr>
+                <th class=" text-center">AUTHOR_ID</th>
+                <th class=" text-center">CONVERSATION_ID</th>
+                <th class=" text-center">CREATED_AT</th>
+                <th class=" text-center">DESCRIPTION</th>
+                <th class=" text-center"><i class="fa fa-retweet"> </i></th>
+                <th class=" text-center">SENTIMENT</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="text-center"> {{bestRetweet.author_id}}</td>
+                <td class="text-center"> {{bestRetweet.conversation_id}}</td>
+                <td class="text-center"> {{bestRetweet.created_at}}</td>
+                <td> {{bestRetweet.description}}</td>
+                <td class="text-center"> {{bestRetweet.retweet_count}}</td>
+                <td class="text-center"> {{bestRetweet.sentiment}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class=" row">
+    <div class="card">
+      <div class=" card-header">
+        <h4 class=" card-title">Tweet with the most likes</h4>
+      </div>
+      <div class="card-body">
+        <div class=" table-responsive">
+          <table class=" table tablesorter" id="">
+            <thead class=" text-primary">
+              <tr>
+                <th class=" text-center">AUTHOR_ID</th>
+                <th class=" text-center">CONVERSATION_ID</th>
+                <th class=" text-center">CREATED_AT</th>
+                <th class=" text-center">DESCRIPTION</th>
+                <th class=" text-center"><i class="fa fa-heart"> </i></th>
+                <th class=" text-center">SENTIMENT</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="text-center"> {{bestLike.author_id}}</td>
+                <td class="text-center"> {{bestLike.conversation_id}}</td>
+                <td class="text-center"> {{bestLike.created_at}}</td>
+                <td> {{bestLike.description}}</td>
+                <td class="text-center"> {{bestLike.like_count}}</td>
+                <td class="text-center"> {{bestLike.sentiment}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

@@ -24,26 +24,19 @@ public class DashboardController {
     @Post(value="/tweets",produces = MediaType.TEXT_PLAIN)
     public void getTweets(HashMap<String, String> tweets) {
         jsonObject = new JSONObject(tweets);
-        System.out.println(tweets);
-        System.out.println(jsonObject);
-
-        this.tweets = update(jsonObject, this.tweets);
+        this.tweets = formatting(jsonObject);
     }
 
-    private HashMap<String, JSONObject> update(JSONObject jsonObject, HashMap<String, JSONObject> hashMap) {
+    private HashMap<String, JSONObject> formatting(JSONObject jsonObject) {
+        HashMap<String, JSONObject> hashMap = new HashMap<>();
         Iterator<String> keys = jsonObject.keys();
 
         while(keys.hasNext()) {
             String key = keys.next();
-
-            if (!tweets.containsKey(key)) {
-                JSONObject value = new JSONObject(new String(Base64.getDecoder().decode((String) jsonObject.get(key))));
-//                System.out.println(value);
-                tweets.put(key, value);
-            }
+            JSONObject value = new JSONObject(new String(Base64.getDecoder().decode(jsonObject.getString(key))));
+            hashMap.put(key, value);
         }
-//
-        System.out.println(hashMap);
+
         return hashMap;
     }
 }

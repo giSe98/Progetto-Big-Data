@@ -6,62 +6,19 @@
           <div class=" row">
             <!--BUTTON LEFT-->
             <div class=" col-sm-6 text-left" style="font-size: 8px">
-
-              <div
-                class=" btn-group btn-group-toggle float-left"
-                data-toggle="buttons"
-              >
-                <label class=" btn btn-sm btn-danger btn-simple" (click)="data=datasets[0];updateOptions();clicked3=true;clicked4=false;clicked5=false" [ngClass]="{'active':clicked3===true}">
-                  <input checked="checked" name="options" type="radio" />
-
-                  <span
-                    class=" d-none d-sm-block d-md-block d-lg-block d-xl-block"
-                  >
-                    2022
-                  </span>
-                  <span class=" d-block d-sm-none">
-                    <i class=" tim-icons icon-single-02"> </i>
-                  </span>
-                </label>
-                <label class=" btn btn-sm btn-danger btn-simple" (click)="data=datasets[1];updateOptions();clicked3=false;clicked4=true;clicked5=false" [ngClass]="{'active':clicked4===true}">
-                  <input
-                    class=" d-none d-sm-none"
-                    name="options"
-                    type="radio"
-                  />
-
-                  <span
-                    class=" d-none d-sm-block d-md-block d-lg-block d-xl-block"
-                  >
-                    2021
-                  </span>
-                  <span class=" d-block d-sm-none">
-                    <i class=" tim-icons icon-gift-2"> </i>
-                  </span>
-                </label>
-                <label class=" btn btn-sm btn-danger btn-simple" (click)="data=datasets[2];updateOptions();clicked3=false;clicked4=false;clicked5=true" [ngClass]="{'active':clicked5===true}">
-                  <input class=" d-none" name="options" type="radio" />
-
-                  <span
-                    class=" d-none d-sm-block d-md-block d-lg-block d-xl-block"
-                  >
-                    2020
-                  </span>
-                  <span class=" d-block d-sm-none">
-                    <i class=" tim-icons icon-tap-02"> </i>
-                  </span>
-                </label>
-              </div>
-
+              <h3>
+                <i class="fab fa-twitter text-info"> </i>    
+                Total tweets {{who}} on date {{date | date: 'dd/MM/yyyy'}}: {{how}}/{{count}}
+              </h3>
             </div>
-
+              
             <!--BUTTON RIGTH-->
             <div class=" col-sm-6">
               <div
                 class=" btn-group btn-group-toggle float-right"
                 data-toggle="buttons"
               >
-                <label class=" btn btn-sm btn-danger btn-simple" (click)="data=datasets[0];updateOptions();clicked=true;clicked1=false;clicked2=false" [ngClass]="{'active':clicked===true}">
+                <label class=" btn btn-sm btn-danger btn-simple" (click)="data=datasetProValues;chart_labels=labelsPro;updateOptions();clicked=true;clicked1=false;how=pro;who='ProVax';" [ngClass]="{'active':clicked===true}">
                   <input checked="checked" name="options" type="radio" />
 
                   <span
@@ -73,9 +30,9 @@
                     <i class=" tim-icons icon-single-02"> </i>
                   </span>
                 </label>
-                <label class=" btn btn-sm btn-danger btn-simple" (click)="data=datasets[1];updateOptions();clicked=false;clicked1=true;clicked2=false" [ngClass]="{'active':clicked1===true}">
+                <label class=" btn btn-sm btn-danger btn-simple" (click)="data=datasetNoValues;chart_labels=labelsNo;updateOptions();clicked=false;clicked1=true;how=no;who='NoVax'" [ngClass]="{'active':clicked1===true}">
                   <input
-                    class=" d-none d-sm-none"
+                  checked="checked"
                     name="options"
                     type="radio"
                   />
@@ -89,27 +46,10 @@
                     <i class=" tim-icons icon-gift-2"> </i>
                   </span>
                 </label>
-                <label class=" btn btn-sm btn-danger btn-simple" (click)="data=datasets[2];updateOptions();clicked=false;clicked1=false;clicked2=true" [ngClass]="{'active':clicked2===true}">
-                  <input class=" d-none" name="options" type="radio" />
-
-                  <span
-                    class=" d-none d-sm-block d-md-block d-lg-block d-xl-block"
-                  >
-                    Comparati
-                  </span>
-                  <span class=" d-block d-sm-none">
-                    <i class=" tim-icons icon-tap-02"> </i>
-                  </span>
-                </label>
               </div>
             </div>
 
           </div>
-          <p></p>
-          <h3>
-            <i class="fab fa-twitter text-info"> </i>    count
-
-          </h3>
         </div>
 
         <div class=" card-body">
@@ -119,308 +59,32 @@
     </div>
   </div>
 <!-------------------------------------------------------------------------->
+
   <div class=" row">
-    <div class=" col-lg-6">
-
-      <div class=" card card-chart">
-        <div class=" card-header">
-          <div class="input-box-container">
-            <input class="form-control"
-              angular-mydatepicker (click)="dp.toggleCalendar()" 
-              [(ngModel)]="firstModel" [options]="firstOptions"
-              (dateChanged)="onDateChanged($event)"
-              #dp="angular-mydatepicker"/>
-          </div>
-          <p></p>
-          <h3>
-            <i class="fab fa-twitter text-info"> </i> count
-          </h3>
-        </div>
-        <div class=" card-body">
-          <div class=" chart-area"><canvas id="chartLineRed"> </canvas></div>
-        </div>
-      </div>
-
-    </div>
-    
-    <div class=" col-lg-6">
-      <div class=" card card-chart">
-        <div class=" card-header">
-          <div class="input-box-container">
-            <input class="form-control"
-              angular-mydatepicker (click)="dp2.toggleCalendar()" 
-              [(ngModel)]="secondModel" [options]="secondOptions"
-              (dateChanged)="onRangeDateSelection($event)"
-              #dp2="angular-mydatepicker"/>
-          </div>
-          <p></p>
-          <h3>
-            <i class="fab fa-twitter text-info"> </i> count
-          </h3>
-        </div>
-        <div class=" card-body">
-          <div class=" chart-area"><canvas id="chartLineGreen"> </canvas></div>
-        </div>
-      </div>
-    </div>
-  <!--
-    <div class=" col-lg-4">
-      <div class=" card card-chart">
-        <div class=" card-header">
-          <div class="input-box-container">
-            <input class="form-control"
-              angular-mydatepicker (click)="dp3.toggleCalendar()" 
-              [(ngModel)]="thirdModel" [options]="thirdOptions"
-              (dateChanged)="onCalendarViewChanged($event)"
-              #dp3="angular-mydatepicker"/>
-          </div>
-          <p></p>
-          <h3>
-            <i class="fab fa-twitter text-info"> </i> count
-          </h3>
-        </div>
-        <div class=" card-body">
-          <div class=" chart-area"><canvas id="chartLineGreen"> </canvas></div>
-        </div>
-      </div>
-    </div>-->
-  </div>
-
-  
-  <div class=" row">
-    <!--
-    <div class=" col-lg-6 col-md-12">
-      <div class=" card card-tasks">
-        <div class=" card-header">
-          <h4 class=" title d-inline">Tweet</h4>
-          <div ngbDropdown>
-            <button
-              class=" btn btn-link btn-icon"
-              data-toggle="dropdown"
-              ngbDropdownToggle
-              type="button"
-            >
-              <i class=" tim-icons icon-settings-gear-63"> </i>
-            </button>
-            <div
-              aria-labelledby="dropdownMenuLink"
-              class=" dropdown-menu-right"
-              ngbDropdownMenu
-            >
-              <a href="javascript:void(0)" ngbDropdownItem> Action </a>
-              <a href="javascript:void(0)" ngbDropdownItem> Another action </a>
-              <a href="javascript:void(0)" ngbDropdownItem> Something else </a>
-            </div>
-          </div>
-        </div>
-        <div class=" card-body">
-          <div class=" table-full-width table-responsive">
-            <table class=" table">
-              <tbody>
-                <tr>
-                  <td>
-                    <div class=" form-check">
-                      <label class=" form-check-label">
-                        <input
-                          class=" form-check-input"
-                          type="checkbox"
-                          value=""
-                        />
-
-                        <span class=" form-check-sign">
-                          <span class=" check"> </span>
-                        </span>
-                      </label>
-                    </div>
-                  </td>
-                  <td>
-                    <p class=" title">Update the Documentation</p>
-                    <p class=" text-muted">
-                      Dwuamish Head, Seattle, WA 8:47 AM
-                    </p>
-                  </td>
-                  <td class=" td-actions text-right">
-                    <button class=" btn btn-link" type="button" placement="left" ngbTooltip="Edit Task" container="body" >
-                      <i class=" tim-icons icon-pencil"> </i>
-                    </button>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <div class=" form-check">
-                      <label class=" form-check-label">
-                        <input
-                          checked=""
-                          class=" form-check-input"
-                          type="checkbox"
-                          value=""
-                        />
-
-                        <span class=" form-check-sign">
-                          <span class=" check"> </span>
-                        </span>
-                      </label>
-                    </div>
-                  </td>
-                  <td>
-                    <p class=" title">GDPR Compliance</p>
-                    <p class=" text-muted">
-                      The GDPR is a regulation that requires businesses to
-                      protect the personal data and privacy of Europe citizens
-                      for transactions that occur within EU member states.
-                    </p>
-                  </td>
-                  <td class=" td-actions text-right">
-                    <button class=" btn btn-link" type="button" placement="left" ngbTooltip="Edit Task" container="body" >
-                      <i class=" tim-icons icon-pencil"> </i>
-                    </button>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <div class=" form-check">
-                      <label class=" form-check-label">
-                        <input
-                          class=" form-check-input"
-                          type="checkbox"
-                          value=""
-                        />
-
-                        <span class=" form-check-sign">
-                          <span class=" check"> </span>
-                        </span>
-                      </label>
-                    </div>
-                  </td>
-                  <td>
-                    <p class=" title">Solve the issues</p>
-                    <p class=" text-muted">
-                      Fifty percent of all respondents said they would be more
-                      likely to shop at a company
-                    </p>
-                  </td>
-                  <td class=" td-actions text-right">
-                    <button class=" btn btn-link" type="button" placement="left" ngbTooltip="Edit Task" container="body" >
-                      <i class=" tim-icons icon-pencil"> </i>
-                    </button>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <div class=" form-check">
-                      <label class=" form-check-label">
-                        <input
-                          class=" form-check-input"
-                          type="checkbox"
-                          value=""
-                        />
-
-                        <span class=" form-check-sign">
-                          <span class=" check"> </span>
-                        </span>
-                      </label>
-                    </div>
-                  </td>
-                  <td>
-                    <p class=" title">Release v2.0.0</p>
-                    <p class=" text-muted">
-                      Ra Ave SW, Seattle, WA 98116, SUA 11:19 AM
-                    </p>
-                  </td>
-                  <td class=" td-actions text-right">
-                    <button class=" btn btn-link" type="button" placement="left" ngbTooltip="Edit Task" container="body"  >
-                      <i class=" tim-icons icon-pencil"> </i>
-                    </button>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <div class=" form-check">
-                      <label class=" form-check-label">
-                        <input
-                          class=" form-check-input"
-                          type="checkbox"
-                          value=""
-                        />
-
-                        <span class=" form-check-sign">
-                          <span class=" check"> </span>
-                        </span>
-                      </label>
-                    </div>
-                  </td>
-                  <td>
-                    <p class=" title">Export the processed files</p>
-                    <p class=" text-muted">
-                      The report also shows that consumers will not easily
-                      forgive a company once a breach exposing their personal
-                      data occurs.
-                    </p>
-                  </td>
-                  <td class=" td-actions text-right">
-                    <button class=" btn btn-link" type="button" placement="left" ngbTooltip="Edit Task" container="body" >
-                      <i class=" tim-icons icon-pencil"> </i>
-                    </button>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <div class=" form-check">
-                      <label class=" form-check-label">
-                        <input
-                          class=" form-check-input"
-                          type="checkbox"
-                          value=""
-                        />
-
-                        <span class=" form-check-sign">
-                          <span class=" check"> </span>
-                        </span>
-                      </label>
-                    </div>
-                  </td>
-                  <td>
-                    <p class=" title">Arival at export process</p>
-                    <p class=" text-muted">
-                      Capitol Hill, Seattle, WA 12:34 AM
-                    </p>
-                  </td>
-                  <td class=" td-actions text-right">
-                    <button class=" btn btn-link" type="button" placement="left" ngbTooltip="Edit Task" container="body" >
-                      <i class=" tim-icons icon-pencil"> </i>
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>-->
     <div class=" col-12 col-md-12">
       <div class=" card">
         <div class=" card-header">
-          <h4 class=" card-title">Tweet</h4>
+          <h4 class=" card-title">Tweets</h4>
         </div>
         <div class=" card-body">
           <div class=" table-responsive">
             <table class=" table tablesorter" id="">
               <thead class=" text-primary">
-                <tr>
-                  <th>ID</th>
-                  <th>WHO</th>
-                  <th>WHEN</th>
-                  <th>WHAT</th>
+                <tr> 
+                  <th class=" text-center">AUTHOR_ID</th>
+                  <th class=" text-center">CONVERSATION_ID</th>
+                  <th class=" text-center">CREATED_AT</th>
+                  <th class=" text-center">DESCRIPTION</th>
                   <th class=" text-center">SENTIMENT</th>
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>1467810672</td>
-                  <td>Niger</td>
-                  <td>Oud-Turnhout</td>
-                  <td>Oud-Turnhout</td>
-                  <td class=" text-center">POS</td>
+                <tr *ngFor="let tweet of tweets">
+                  <td class="text-center"> {{tweet.author_id}}</td>
+                  <td class="text-center"> {{tweet.conversation_id}}</td>
+                  <td class="text-center"> {{tweet.created_at}}</td>
+                  <td> {{tweet.description}}</td>
+                  <td class="text-center"> {{tweet.sentiment}}</td>
                 </tr>
                 
               </tbody>

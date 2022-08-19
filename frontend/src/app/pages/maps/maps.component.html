@@ -1,7 +1,13 @@
 <style>
-  .wrap-header{
+  .wrap-header1{
     border: 10px solid #27293d;
-    padding-left: 103px;
+    padding-left: 109px;
+    font-size: 45px;
+  }
+
+  .wrap-header2{
+    border: 10px solid #27293d;
+    padding-left: 144px;
     font-size: 45px;
   }
 
@@ -23,9 +29,9 @@
   <div class=" row">
       <div class="col-sm"></div>
       <div class="card col-sm-6">
-        <div class="card-header wrap-header">Analisi in real time</div>
+        <div class="card-header wrap-header1">Relative Positions</div>
         <div class="card-body wrap-map">
-          <igx-geographic-map #mapRealTime
+          <igx-geographic-map #mapRelativePositions
             width="580px"
             height="580px"
             zoomable="true" >
@@ -47,29 +53,16 @@
           <table class=" table tablesorter" id="">
             <thead class=" text-primary">
               <tr>
-                <th *ngFor="let a of countriesRealTime">
+                <th *ngFor="let a of countriesRelativePositions">
                   {{a}}
                 </th>
-                <!--
-                <th>ID</th>
-                <th>WHO</th>
-                <th>WHEN</th>
-                <th>WHAT</th>
-                <th class=" text-center">SENTIMENT</th>
-                -->
               </tr>
             </thead>
             <tbody>
               <tr>
-                <th *ngFor="let a of valuesRealTime">
+                <td *ngFor="let a of valuesRelativePositions">
                   {{a}}
-                </th>
-                <!--
-                <td>1467810672</td>
-                <td>Niger</td>
-                <td>Oud-Turnhout</td>
-                <td>Oud-Turnhout</td>
-                <td class=" text-center">POS</td>-->
+                </td>
               </tr>
               
             </tbody>
@@ -78,16 +71,11 @@
       </div>
     </div>
   
-    <!--
-    <div class="col-sm"></div>
-    <div class="col-sm-6 wrap-legend">ASD</div>
-    <div class="col-sm"></div>
-  -->
   </div>
   <div class=" row">
     <div class="col-sm"></div>
     <div class="card col-sm-6">
-      <div class="card-header wrap-header">Analisi in batch</div>
+      <div class="card-header wrap-header2">Real Positions</div>
       <div class="card-body wrap-map">
         <igx-geographic-map #map
           width="580px"
@@ -106,45 +94,29 @@
 </div>
 <div class=" row">
   <div class="card">
+    <div class=" card-header">
+      Tweets with position on tweets without: {{realPositions.length}}/{{total}}
+    </div>
     <div class=" card-body">
       <div class=" table-responsive">
         <table class=" table tablesorter" id="">
           <thead class=" text-primary">
             <tr>
-              <th *ngFor="let a of countries">
+              <th *ngFor="let a of countriesRealPositions">
                 {{a}}
               </th>
-              <!--
-              <th>ID</th>
-              <th>WHO</th>
-              <th>WHEN</th>
-              <th>WHAT</th>
-              <th class=" text-center">SENTIMENT</th>-->
             </tr>
           </thead>
           <tbody>
             <tr>
-              <th *ngFor="let a of values">
+              <td *ngFor="let a of valuesRealPositions">
                 {{a}}
-              </th>
-              <!--
-              <td>1467810672</td>
-              <td>Niger</td>
-              <td>Oud-Turnhout</td>
-              <td>Oud-Turnhout</td>
-              <td class=" text-center">POS</td>-->
+              </td>
             </tr>
-            
           </tbody>
         </table>
       </div>
     </div>
   </div>
-
-  <!--
-  <div class="col-sm"></div>
-  <div class="col-sm-6 wrap-legend">ASD</div>
-  <div class="col-sm"></div>
--->
 </div>
 </div>

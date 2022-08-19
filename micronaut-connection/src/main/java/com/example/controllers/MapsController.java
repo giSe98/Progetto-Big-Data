@@ -19,45 +19,32 @@ public class MapsController {
     @Post(value="/relativePositions",produces = MediaType.TEXT_PLAIN)
     public void relativePosition(HashMap<String, String> geo) {
         jsonObject = new JSONObject(geo);
-//        System.out.println(geo);
-//        System.out.println(jsonObject);
-        this.geo = update(jsonObject, this.geo);
+        this.geo = formatting(jsonObject);
     }
 
     @Get(value="/realPositions",produces = MediaType.TEXT_PLAIN)
     public String realPosition() {
-        System.out.println(this.real);
         return this.real.values().toString();
     }
 
     @Post(value="/realPositions",produces = MediaType.TEXT_PLAIN)
     public void realPosition(HashMap<String, String> real) {
         jsonObject = new JSONObject(real);
-        System.out.println(real);
-        System.out.println(jsonObject);
-        this.real = update(jsonObject, this.real);
+        this.real = formatting(jsonObject);
     }
 
-    private HashMap<String, JSONObject> update(JSONObject jsonObject, HashMap<String, JSONObject> hashMap) {
+    private HashMap<String, JSONObject> formatting(JSONObject jsonObject) {
+        HashMap<String, JSONObject> hashMap = new HashMap<>();
         Iterator<String> keys = jsonObject.keys();
 
         while(keys.hasNext()) {
             String key = keys.next();
 
-            if (hashMap.containsKey(key)) {
-                JSONObject object = hashMap.get(key);
-//                System.out.println(object);
-                hashMap.put(key, object.put("pop", object.getDouble("pop") + 0.01));
-            }
-            else {
-                String encode = jsonObject.getString(key);
-                JSONObject value = new JSONObject(new String(Base64.getDecoder().decode(encode)));
-                System.out.println(value);
-                hashMap.put(key, value);
-            }
+            String encode = jsonObject.getString(key);
+            JSONObject value = new JSONObject(new String(Base64.getDecoder().decode(encode)));
+            hashMap.put(key, value);
         }
-//
-        System.out.println(hashMap);
+
         return hashMap;
     }
 }

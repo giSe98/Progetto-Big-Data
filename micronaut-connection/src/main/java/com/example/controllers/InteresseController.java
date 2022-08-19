@@ -9,6 +9,7 @@ import org.json.JSONObject;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 @Controller("/interesse")
 public class InteresseController {
@@ -25,10 +26,7 @@ public class InteresseController {
     @Post(value="/device",produces = MediaType.TEXT_PLAIN)
     public void device(HashMap<String, Integer> device) {
         jsonObject = new JSONObject(device);
-        //System.out.println(jsonObject);
-        this.device = update(jsonObject, this.device);
-
-        //System.out.println("ASD " + this.device);
+        this.device = formatting(jsonObject);
     }
 
     @Get(value="/lang",produces = MediaType.TEXT_PLAIN)
@@ -37,8 +35,7 @@ public class InteresseController {
     @Post(value="/lang",produces = MediaType.TEXT_PLAIN)
     public void lang(HashMap<String, Integer> lang) {
         jsonObject = new JSONObject(lang);
-        //System.out.println(jsonObject);
-        this.lang = update(jsonObject, this.lang);
+        this.lang = formatting(jsonObject);
     }
 
     @Get(value="/bestRetweet",produces = MediaType.TEXT_PLAIN)
@@ -47,10 +44,7 @@ public class InteresseController {
     @Post(value="/bestRetweet",produces = MediaType.TEXT_PLAIN)
     public void bestRetweet(String tweet) {
         jsonObject = new JSONObject(new String(Base64.getDecoder().decode(tweet)));
-        System.out.println(jsonObject);
-
-        if(this.bestRetweet.isEmpty() || this.bestRetweet.getInt("retweet_count") <= jsonObject.getInt("retweet_count"))
-            this.bestRetweet = jsonObject;
+        this.bestRetweet = jsonObject;
     }
 
     @Get(value="/bestLike",produces = MediaType.TEXT_PLAIN)
@@ -59,22 +53,18 @@ public class InteresseController {
     @Post(value="/bestLike",produces = MediaType.TEXT_PLAIN)
     public void bestLike(String tweet) {
         jsonObject = new JSONObject(new String(Base64.getDecoder().decode(tweet)));
-        System.out.println(jsonObject);
-
-        if(this.bestLike.isEmpty() || this.bestLike.getInt("like_count") <= jsonObject.getInt("like_count"))
-            this.bestLike = jsonObject;
+        this.bestLike = jsonObject;
     }
 
-    private HashMap<String, Integer> update(JSONObject jsonObject, HashMap<String, Integer> hashMap) {
+    private HashMap<String, Integer> formatting(JSONObject jsonObject) {
+        HashMap<String, Integer> hashMap = new HashMap<>();
         Iterator<String> keys = jsonObject.keys();
 
         while(keys.hasNext()) {
             String key = keys.next();
-            hashMap.computeIfPresent(key, (k, v) -> v + jsonObject.getInt(key));
-            hashMap.computeIfAbsent(key, v -> jsonObject.getInt(key));
+            hashMap.put(key, jsonObject.getInt(key));
         }
 
-        System.out.println(hashMap);
         return hashMap;
     }
 }

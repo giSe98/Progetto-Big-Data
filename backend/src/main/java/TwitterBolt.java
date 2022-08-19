@@ -25,7 +25,6 @@ import java.util.*;
 
 public class TwitterBolt extends BaseRichBolt {
     private OutputCollector collector;
-    private final int numTweet=10;
 
     private int i=0; //indice tweet
     private StanfordCoreNLP stanfordCoreNLP = null;
@@ -39,13 +38,9 @@ public class TwitterBolt extends BaseRichBolt {
 
     private int bestR = Integer.MIN_VALUE; // indice retweet
     private JSONObject retweetObj; // object
-    private int retweet = 0;
     private int best_like = 0; //dovrebbe contare il numero di like di ogni tweet e restituire quello migliore ma da null pointer exception
     private JSONObject likeObj; // object
 
-    //per l'utilizzo del file
-    public File file;
-    public String path = "./backend/result.txt";
 
     @Override
     public void prepare(Map<String, Object> topoConf, TopologyContext context, OutputCollector collector) {
@@ -59,61 +54,38 @@ public class TwitterBolt extends BaseRichBolt {
     @Override
     public void execute(Tuple input) {
         if(input.getString(0).equals("tweet finiti")){
+            System.out.println("Sending");
             String json = "";
-
-            System.out.println("--------------------------------------------------------------------------------");
-            //stampa sentiment analysys
-            //System.out.println("P= "+valoriAnalisi.get("Positive")+" N= "+valoriAnalisi.get("Negative")+" neutral= "+valoriAnalisi.get("Neutral"));
 
             json = createStringTweets(tweets);
             sendData(json, "/dashboard/tweets");
-            System.out.println("--------------------------------------------------------------------------------");
-            //stampa più famoso retweet con valori di like e commenti
+
+            //send best retweet
             json = createStringBestTweet(retweetObj, "retweet");
             sendData(json, "/interesse/bestRetweet");
 
-            System.out.println(retweetObj);
-            System.out.println("tweet più retweettato: "+retweetObj.getJSONObject("includes").getJSONArray("tweets").getJSONObject(0).getString("text"));
-            System.out.println("num like= "+retweetObj.getJSONObject("includes").getJSONArray("tweets").getJSONObject(0).getJSONObject("public_metrics").getString("like_count")+ " num reply= "+retweetObj.getJSONObject("includes").getJSONArray("tweets").getJSONObject(0).getJSONObject("public_metrics").getString("reply_count"));
-            System.out.println("--------------------------------------------------------------------------------");
-            //stampa tweet con più like
+            //send tweet with most like
             json = createStringBestTweet(likeObj, "like");
             sendData(json, "/interesse/bestLike");
 
-            System.out.println(likeObj);
-            System.out.println("tweet con più like: "+likeObj.getJSONObject("includes").getJSONArray("tweets").getJSONObject(0).getString("text")+" numLike: "+best_like);
-            //stampa device
-//            device.entrySet().forEach(entry->{
-//                System.out.println(entry.getKey()+" "+entry.getValue());
-//            });
+            //send device
             json = createString(device);
             sendData(json, "/interesse/device");
-            System.out.println("--------------------------------------------------------------------------------");
-            //stampa se sono retweet
-            System.out.println("sono retweet= "+retweet+" non lo sono= "+(numTweet-retweet));
-            System.out.println("--------------------------------------------------------------------------------");
-            //stampa countries
-//            countries.entrySet().forEach(entry->{
-//                System.out.println(entry.getKey()+" "+entry.getValue());
-//            });
-            System.out.println("--------------------------------------------------------------------------------");
+
+            //send positions deduced
             json = createStringGeo(geo);
-            System.out.println(json);
             sendData(json, "/maps/relativePositions");
 
+            //send real positions
             if (!realPositions.isEmpty()) {
                 json = createStringGeo(realPositions);
-                System.out.println(json);
                 sendData(json, "/maps/realPositions");
             }
-            System.out.println("--------------------------------------------------------------------------------");
-            //stampa lang
+
+            //send lang
             json = createString(lang);
             sendData(json, "/interesse/lang");
-//            lang.entrySet().forEach(entry->{
-//                System.out.println(entry.getKey()+" "+entry.getValue());
-//            });
-            System.exit(0);
+            System.out.println("Sending complete");
         }
 
         try {
@@ -121,9 +93,6 @@ public class TwitterBolt extends BaseRichBolt {
             JSONObject o = new JSONObject(line);
 
             JSONObject tweet = extractTweetJSON(o);
-
-            //richiamo metodo per scrivere sul file
-            //scrivi(o);
 
             String language = o.getJSONObject("data").getString("lang");
             update(lang, language);
@@ -135,20 +104,13 @@ public class TwitterBolt extends BaseRichBolt {
             tweet.put("sentiment", sentiment);
             tweets.put(tweet.getString("conversation_id"), tweet);
 
-            System.out.println(tweets);
+            bestRetweet(o);
 
-
-            //query per i retweet
-            checkRetweet(o);
-
-            //query per i like
             bestLike(o);
 
-            //query sul tipo di device
             String source = o.getJSONObject("data").getString("source");
             update(device, source);
 
-            //query su location dell'utente e sulla location più attiva
             getCountry(o);
             countries.remove("null");
             countries.remove("None");
@@ -168,35 +130,6 @@ public class TwitterBolt extends BaseRichBolt {
         ret.put("description", o.getJSONObject("data").getString("text"));
 
         return ret;
-    }
-
-    //metodo per scrivere sul file
-    public void scrivi(JSONObject o){
-        //controllo se è presente la geolocalizzazione
-        System.out.println("tweet analizzati pre: "+i);
-        if(!o.getJSONObject("data").getString("geo").equals("{}")){
-            i++;
-            //scrittura sul file del dato con la geolocalizzazione
-            try {
-                file = new File(path);
-                if (file.exists()) {
-                    System.out.println("Il file " + path + " esiste");
-                    System.out.println("tweet analizzati "+i);
-                }
-                else if (file.createNewFile())
-                    System.out.println("Il file " + path + " è stato creato");
-                else
-                    System.out.println("Il file " + path + " non può essere creato");
-
-                FileWriter fw = new FileWriter(file,true);
-                fw.write(String.valueOf(o+"\n"));
-                fw.flush();
-                fw.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        else i++;
     }
 
     private void sendData(String json, String endpoint) {
@@ -296,19 +229,13 @@ public class TwitterBolt extends BaseRichBolt {
         return ret;
     }
 
-    private void checkRetweet(JSONObject o) {
-        if (o.getJSONObject("data").has("referenced_tweets")) {
-            //retweet con più like
-            bestRetweet(o);
-            retweet++;
-        }
-    }
-
     private void bestRetweet(JSONObject o) {
-        int c = Integer.parseInt(o.getJSONObject("data").getJSONObject("public_metrics").getString("retweet_count"));
-        if (c > bestR) {
-            bestR = c;
-            retweetObj = o;
+        if (o.getJSONObject("data").has("referenced_tweets")) {
+            int c = Integer.parseInt(o.getJSONObject("data").getJSONObject("public_metrics").getString("retweet_count"));
+            if (c > bestR) {
+                bestR = c;
+                retweetObj = o;
+            }
         }
     }
 
@@ -348,11 +275,8 @@ public class TwitterBolt extends BaseRichBolt {
                 pr.waitFor();
                 BufferedReader buf = new BufferedReader(new InputStreamReader(pr.getInputStream()));
                 String asd = buf.readLine();
-                System.out.println(cmd);
-                System.out.println(asd);
                 buff = new JSONObject(asd);
                 buff.put("name", Base64.getEncoder().encodeToString(city.getBytes(StandardCharsets.ISO_8859_1)));
-                //System.out.println(buff);
 
                 country = buff.getString("country");
 
@@ -372,7 +296,7 @@ public class TwitterBolt extends BaseRichBolt {
             JSONObject result = new JSONObject();
             JSONObject place = o.getJSONObject("includes").getJSONArray("places").getJSONObject(0);
             result.put("country", place.getString("country"));
-            result.put("name", place.getString("name"));
+            result.put("name", Base64.getEncoder().encodeToString(place.getString("name").getBytes(StandardCharsets.ISO_8859_1)));
             result.put("lat", place.getJSONObject("geo").getJSONArray("bbox").get(1));
             result.put("lon", place.getJSONObject("geo").getJSONArray("bbox").get(0));
 

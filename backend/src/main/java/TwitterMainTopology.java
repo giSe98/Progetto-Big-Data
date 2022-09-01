@@ -1,7 +1,6 @@
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
 import org.apache.storm.topology.TopologyBuilder;
-import org.apache.storm.utils.Utils;
 
 public class TwitterMainTopology {
     public static void main(String[] args) {
@@ -11,7 +10,6 @@ public class TwitterMainTopology {
 
         Config config = new Config();
         config.put(Config.TOPOLOGY_BOLTS_WINDOW_LENGTH_DURATION_MS,10000);   //lunghezza della topologia
-        //config.setDebug(false);
 
         try (LocalCluster cluster = new LocalCluster()) {
             cluster.submitTopology("Twitter", config, builder.createTopology());

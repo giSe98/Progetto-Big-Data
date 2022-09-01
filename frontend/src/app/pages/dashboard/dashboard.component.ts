@@ -32,8 +32,8 @@ export class DashboardComponent implements OnInit {
   public datasetProValues: any[] = [0];
   public datasetNoValues: any[] = [0];
 
-  public labelsPro: any[] = ["00:00"];
-  public labelsNo: any[] = ["00:00"];
+  public labelsPro: any[] = ["00:00:00"];
+  public labelsNo: any[] = ["00:00:00"];
 
   public chart_labels: any;
 
@@ -164,7 +164,7 @@ export class DashboardComponent implements OnInit {
 
     for (let value of dataset) {
       if (value.sentiment === e) {
-        var v = value.created_at.split("T")[1].slice(0, 5);
+        var v = value.created_at.split("T")[1].slice(0, 8);
         ret[v] = (ret[v] || 0) + 1;
       }
     }

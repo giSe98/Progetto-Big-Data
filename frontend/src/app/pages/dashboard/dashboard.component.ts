@@ -28,12 +28,15 @@ export class DashboardComponent implements OnInit {
 
   public datasetPro: any;
   public datasetNo: any;
+  public datasetAll: any;
 
   public datasetProValues: any[] = [0];
   public datasetNoValues: any[] = [0];
+  public datasetAllValues: any[] = [0];
 
   public labelsPro: any[] = ["00:00:00"];
   public labelsNo: any[] = ["00:00:00"];
+  public labelsAll: any[] = ["00:00:00"];
 
   public chart_labels: any;
 
@@ -45,13 +48,17 @@ export class DashboardComponent implements OnInit {
     this.http.get<any>("http://localhost:8080/dashboard/tweets").subscribe(res => {
         this.tweets = res;
         this.count = this.tweets.length;
+
         this.pro = this.tweets.map((get) => get.sentiment).filter((v, i, a) => v == "Positive").length;
         this.no = this.tweets.map((get) => get.sentiment).filter((v, i, a) => v == "Negative").length;
         this.how = this.pro;
 
         this.datasetPro = this.getTimeSum(this.tweets, "Positive");
         this.datasetNo = this.getTimeSum(this.tweets, "Negative");
+        this.datasetAll = this.getTimeSum(this.tweets, "");
 
+        this.labelsAll = Object.keys(this.datasetAll);
+        this.datasetAllValues = Object.values(this.datasetAll);
         
         if (Object.keys(this.datasetPro).length !== 0){
           this.labelsPro = Object.keys(this.datasetPro);
@@ -160,13 +167,27 @@ export class DashboardComponent implements OnInit {
   }
 
   private getTimeSum(dataset: any[], e: string) {
+    let tmp = {};
+
+    if (e === "") {
+      for (let value of dataset) {
+        var v = value.created_at.split("T")[1].slice(0, 8);
+        tmp[v] = (tmp[v] || 0) + 1;
+      }
+    }
+    else {
+      for (let value of dataset) {
+        if (value.sentiment === e) {
+          var v = value.created_at.split("T")[1].slice(0, 8);
+          tmp[v] = (tmp[v] || 0) + 1;
+        }
+      }
+    }
+
     let ret = {};
 
-    for (let value of dataset) {
-      if (value.sentiment === e) {
-        var v = value.created_at.split("T")[1].slice(0, 8);
-        ret[v] = (ret[v] || 0) + 1;
-      }
+    for (let value of Object.keys(tmp).sort()) {
+      ret[value] = tmp[value];
     }
 
     return ret;

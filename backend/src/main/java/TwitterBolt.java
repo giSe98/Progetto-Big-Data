@@ -25,8 +25,6 @@ import java.util.*;
 
 public class TwitterBolt extends BaseRichBolt {
     private OutputCollector collector;
-
-    private int i=0; //indice tweet
     private StanfordCoreNLP stanfordCoreNLP = null;
     private Map<String,Integer> valoriAnalisi= new HashMap<>();
     private Map<String, Integer> device = new HashMap<>();
@@ -116,7 +114,6 @@ public class TwitterBolt extends BaseRichBolt {
             countries.remove("None");
         } catch (Exception e) {}
 
-        i++;
         collector.emit("stream", new Values(input.getString(0)));
     }
 

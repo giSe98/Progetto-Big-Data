@@ -62,9 +62,8 @@ public class TwitterSpout extends BaseRichSpout {
             }
             else {
                 this.spoutOutputCollector.emit("stream", new Values(new String("tweet finiti")));
+                i = 0;
             }
-
-
         } catch(Exception e){
             e.printStackTrace();
         }

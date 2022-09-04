@@ -1,5 +1,3 @@
-package Test;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -13,7 +11,6 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.apache.storm.utils.Utils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -22,8 +19,7 @@ import java.io.InputStreamReader;
 import java.util.*;
 
 public class TwitterStream {
-    private static final String bearer = "AAAAAAAAAAAAAAAAAAAAAFS6XgEAAAAAJEjYe3xU0MVazyixZSfa4%2B0c59E%3DgwwLmvJFo42oRCNko0gYfwoy5IeVqQ6WZqdktyn6qAfdoOHaD1";
-            //System.getenv("BEARER_TOKEN");
+    private static final String bearer = System.getenv("BEARER_TOKEN");
 
     private static void connectStream() {
         CloseableHttpClient client = HttpClients.custom().setDefaultRequestConfig(RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).build()).build();
@@ -169,43 +165,7 @@ public class TwitterStream {
 
 
     public static void main(String[] args) {
-        /*
-        Map<String, String> rules1 = new HashMap<>();
-        rules1.put("context:123.1220701888179359745", "covid");
-        System.out.println(getAddString(rules1));
-        setupRules(rules1);
-        while (true) {
-            connectStream();
-            Utils.sleep(10);
-        }
-        */
-        //  value    id
-//        Map<String, String> r = new HashMap<>();
-//        r.put("context:123.1220701888179359745 lang:en -is:retweet", "covid");
-
-
-        HttpClient client = HttpClients.custom().setDefaultRequestConfig(RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD).build()).build();
-        try {
-            URIBuilder uriBuilder = new URIBuilder("https://api.twitter.com/2/tweets/1479880081787006981");
-            HttpGet httpGet = new HttpGet(uriBuilder.build());
-            httpGet.setHeader("Authorization", String.format("Bearer %s", bearer));
-            httpGet.setHeader("content-type", "application/json");
-            HttpResponse response = client.execute(httpGet);
-            HttpEntity entity = response.getEntity();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(entity.getContent()));
-            System.out.println(reader.readLine());
-            if(entity != null) {
-                JSONObject jsonObject = new JSONObject(EntityUtils.toString(entity, "UTF-8"));
-                System.out.println(jsonObject);
-
-                String object = jsonObject.getJSONObject("data").getString("text");
-                object = clean(object);
-                System.out.println(object.contains("novax"));
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        /* Take your tests here */
     }
 
     private static String clean(String object) {

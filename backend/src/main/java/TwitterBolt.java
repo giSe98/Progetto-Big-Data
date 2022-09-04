@@ -256,10 +256,11 @@ public class TwitterBolt extends BaseRichBolt {
     private void getCountry(JSONObject o) {
         String country = "";
         JSONObject buff;
-        
-        getRealCountry(o);
 
-        if(o.getJSONObject("includes").getJSONArray("users").getJSONObject(0).has("location")) {
+        if(o.getJSONObject("includes").has("places")) {
+            getRealCountry(o);
+        }
+        else if(o.getJSONObject("includes").getJSONArray("users").getJSONObject(0).has("location")) {
             String city = o.getJSONObject("includes").getJSONArray("users").getJSONObject(0).getString("location");
 
             // pip install geopy -> to make the command work
@@ -289,18 +290,16 @@ public class TwitterBolt extends BaseRichBolt {
     }
 
     private void getRealCountry(JSONObject o) {
-        if(o.getJSONObject("includes").has("places")) {
-            JSONObject result = new JSONObject();
-            JSONObject place = o.getJSONObject("includes").getJSONArray("places").getJSONObject(0);
-            result.put("country", place.getString("country"));
-            result.put("name", Base64.getEncoder().encodeToString(place.getString("name").getBytes(StandardCharsets.ISO_8859_1)));
-            result.put("lat", place.getJSONObject("geo").getJSONArray("bbox").get(1));
-            result.put("lon", place.getJSONObject("geo").getJSONArray("bbox").get(0));
+        JSONObject result = new JSONObject();
+        JSONObject place = o.getJSONObject("includes").getJSONArray("places").getJSONObject(0);
+        result.put("country", place.getString("country"));
+        result.put("name", Base64.getEncoder().encodeToString(place.getString("name").getBytes(StandardCharsets.ISO_8859_1)));
+        result.put("lat", place.getJSONObject("geo").getJSONArray("bbox").get(1));
+        result.put("lon", place.getJSONObject("geo").getJSONArray("bbox").get(0));
 
-            String key = digest(result.toString().getBytes());
-            realPositions.computeIfPresent(key, (k,v) -> v.put("pop", realPositions.get(key).getDouble("pop") + 0.01));
-            realPositions.putIfAbsent(key, result.put("pop", 2.0));
-        }
+        String key = digest(result.toString().getBytes());
+        realPositions.computeIfPresent(key, (k,v) -> v.put("pop", realPositions.get(key).getDouble("pop") + 0.01));
+        realPositions.putIfAbsent(key, result.put("pop", 2.0));
     }
 
     private String digest(byte[] input) {
